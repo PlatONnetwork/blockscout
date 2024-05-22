@@ -66,6 +66,7 @@ defmodule Explorer.Chain.Block.Schema do
         field(:total_difficulty, :decimal)
         field(:refetch_needed, :boolean)
         field(:base_fee_per_gas, Wei)
+        field(:block_reward, Wei)
         field(:is_empty, :boolean)
 
         timestamps()

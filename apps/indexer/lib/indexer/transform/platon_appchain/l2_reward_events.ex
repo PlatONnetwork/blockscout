@@ -19,7 +19,7 @@ defmodule Indexer.Transform.PlatonAppchain.L2RewardEvent do
     items =
       with false <- is_nil(Application.get_env(:indexer, L2Event)[:start_block_l2]),
            reward_manager = Application.get_env(:indexer, L2Event)[:l2_reward_manager],
-           true <- Helper.is_address_correct?(reward_manager) do
+           true <- Helper.address_correct?(reward_manager) do
         reward_manager = String.downcase(reward_manager)
         event_signatures = L2RewardEvent.event_signatures()
 

@@ -19,7 +19,7 @@ defmodule Indexer.Transform.PlatonAppchain.Commitments do
     items =
       with false <- is_nil(Application.get_env(:indexer, Commitment)[:start_block_l2]),
            l2_state_receiver = Application.get_env(:indexer, Commitment)[:l2_state_receiver],
-           true <- Helper.is_address_correct?(l2_state_receiver) do
+           true <- Helper.address_correct?(l2_state_receiver) do
         l2_state_receiver = String.downcase(l2_state_receiver)
         event_signature = Commitment.new_commitment_event_signature()
 

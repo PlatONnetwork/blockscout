@@ -331,7 +331,7 @@ defmodule EthereumJSONRPC.Receipt do
 
   defp entry_to_elixir({key, quantity})
       # 删除  effectiveGasPrice
-       when key in ~w(blockNumber cumulativeGasUsed gasUsed transactionIndex blobGasUsed blobGasPrice l1Fee l1GasPrice l1GasUsed) do
+       when key in ~w(blockNumber cumulativeGasUsed gasUsed transactionIndex effectiveGasPrice blobGasUsed blobGasPrice l1Fee l1GasPrice l1GasUsed) do
     result =
       if is_nil(quantity) do
         nil

@@ -280,6 +280,7 @@ defmodule ConfigHelper do
     "ethereum",
     "filecoin",
     "optimism",
+    "platon_appchain",
     "polygon_edge",
     "polygon_zkevm",
     "rsk",

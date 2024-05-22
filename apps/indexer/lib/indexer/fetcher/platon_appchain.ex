@@ -578,7 +578,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     with {:start_block_l1_undefined, false} <- {:start_block_l1_undefined, is_nil(env[:start_block_l1])},
          platon_appchain_l1_rpc = l1_rpc_url(),
          {:rpc_l1_undefined, false} <- {:rpc_l1_undefined, is_nil(platon_appchain_l1_rpc)},
-         {:contract_is_valid, true} <- {:contract_is_valid, Helper.is_address_correct?(contract_address)},
+         {:contract_is_valid, true} <- {:contract_is_valid, Helper.address_correct?(contract_address)},
          start_block_l1 = parse_integer(env[:start_block_l1]),
          false <- is_nil(start_block_l1),
          true <- start_block_l1 > 0,
@@ -655,7 +655,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
       when table in [Explorer.Chain.PlatonAppchain.L2Event, Explorer.Chain.PlatonAppchain.L2Execute, Explorer.Chain.PlatonAppchain.L2ValidatorEvent, Explorer.Chain.PlatonAppchain.L2RewardEvent, Explorer.Chain.PlatonAppchain.Commitment] do
 
     with {:start_block_l2_undefined, false} <- {:start_block_l2_undefined, is_nil(env[:start_block_l2])},
-         {:contract_address_valid, true} <- {:contract_address_valid, Helper.is_address_correct?(contract_address)},
+         {:contract_address_valid, true} <- {:contract_address_valid, Helper.address_correct?(contract_address)},
          start_block_l2 = parse_integer(env[:start_block_l2]),
          false <- is_nil(start_block_l2),
          true <- start_block_l2 > 0,

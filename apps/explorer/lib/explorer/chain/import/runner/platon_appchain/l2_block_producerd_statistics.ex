@@ -11,7 +11,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2BlockProducedStatistics 
   alias Indexer.Fetcher.PlatonAppchain
   alias Explorer.Chain.Import.Runner
 
-  import Ecto.Query, only: [from: 2]
+  import Ecto.Query, only: [from: 2, subquery: 1]
 
   @behaviour Import.Runner
 

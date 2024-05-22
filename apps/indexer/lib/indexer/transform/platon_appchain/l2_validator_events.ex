@@ -20,7 +20,7 @@ defmodule Indexer.Transform.PlatonAppchain.L2ValidatorEvents do
       with false <-
              is_nil(Application.get_env(:indexer, L2ValidatorEvent)[:start_block_l2]),
            l2_stake_handler = Application.get_env(:indexer, L2ValidatorEvent)[:l2_stake_handler],
-           true <- Helper.is_address_correct?(l2_stake_handler) do
+           true <- Helper.address_correct?(l2_stake_handler) do
         l2_stake_handler = String.downcase(l2_stake_handler)
         event_signatures = L2ValidatorEvent.event_signatures()
 
