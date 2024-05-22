@@ -13,6 +13,8 @@ defmodule BlockScoutWeb.API.V2.StatsController do
   alias Explorer.Counters.AverageBlockTime
   alias Plug.Conn
   alias Timex.Duration
+  alias Explorer.Chain.PlatonAppchain
+  alias Explorer.Chain.PlatonAppchain.L2Validator
 
   @api_true [api?: true]
 
@@ -81,6 +83,7 @@ defmodule BlockScoutWeb.API.V2.StatsController do
       }
       |> add_chain_type_fields()
       |> backward_compatibility(conn)
+      |> add_stats_platon_appchain()
     )
   end
 
@@ -197,5 +200,80 @@ defmodule BlockScoutWeb.API.V2.StatsController do
 
     _ ->
       defp add_chain_type_fields(response), do: response
+  end
+
+
+  defp add_stats_platon_appchain(stats) do
+    if System.get_env("CHAIN_TYPE") == "platon_appchain" do
+      # 获取token总供应量
+      token_contract_address =  System.get_env("INDEXER_PLATON_APPCHAIN_L1_TOKEN_CONTRACT")
+      l1_rpc =  System.get_env("INDEXER_PLATON_APPCHAIN_L1_RPC")
+      tx_data = Ethers.Contracts.ERC20.total_supply()
+      {:ok, total_supply} = Ethers.call(tx_data, to: token_contract_address, rpc_opts: [url: l1_rpc])
+      stats = stats |> Map.put("total_supply", Integer.to_string(total_supply))
+
+      # 获取总质押量及验证人数
+      %{total_staked: total_assets_staked, validator_count: validator_count}  = L2Validator.statistics_validators()
+      stats = stats |> Map.put("validator_count", validator_count)
+      stats = stats |> Map.put("total_assets_staked", total_assets_staked)
+
+      # 计算质押率
+      case  get_excitation_balance() do
+        {:ok, excitation_balance} ->
+          liq_balance =  Decimal.sub(Decimal.new(total_supply), excitation_balance)
+          staked_rate = Decimal.div(total_assets_staked,liq_balance) |> Decimal.mult(100)   # |> Decimal.to_float()
+          stats = stats |> Map.put("staked_rate", staked_rate)
+        _-> stats = stats |> Map.put("staked_rate", nil)
+      end
+
+      # 下个checkpoint批次所在区块(取block表最大区块进行计算)
+      %{block_number: block_number_value} = Chain.get_max_block_number()
+      next_l2_state_batch_block = next_l2_round_block_number(block_number_value)
+      stats = stats |> Map.put("next_l2_state_batch_block", next_l2_state_batch_block)
+
+    else
+      stats
+    end
+  end
+
+  # 激励池余额
+  def get_excitation_balance() do
+    json_rpc_named_arguments = json_rpc_named_arguments(System.get_env("ETHEREUM_JSONRPC_HTTP_URL"))
+    l2_reward_manager_contract = json_rpc_named_arguments(System.get_env("INDEXER_PLATON_APPCHAIN_L2_REWARD_MANAGER_CONTRACT"))
+    address_balances = EthereumJSONRPC.fetch_balances([%{block_quantity: "latest", hash_data: l2_reward_manager_contract}], json_rpc_named_arguments)
+    balance =  case address_balances do
+      {:ok, %EthereumJSONRPC.FetchedBalances{params_list: [%{address_hash: address_hash_value, block_number: block_number_value, value: balance}]}} -> {:ok,Decimal.new(balance)}
+      _-> {:error, nil}
+    end
+  end
+
+  def next_l2_round_block_number(current_block_number) do
+    l2_round_size = String.to_integer(System.get_env("INDEXER_PLATON_APPCHAIN_L2_ROUND_SIZE") || 250)
+    next_round = calculateL2Round(current_block_number, l2_round_size)
+    next_round * l2_round_size + 1
+  end
+
+  def calculateL2Round(current_block_number, round_size) do
+    if rem(current_block_number,round_size)==0 do
+      div(current_block_number, round_size)
+    else
+      div(current_block_number, round_size) + 1
+    end
+  end
+
+  # 返回 JSON rpc 请求时的参数
+  def json_rpc_named_arguments(rpc_url) do
+    [
+      transport: EthereumJSONRPC.HTTP,
+      transport_options: [
+        http: EthereumJSONRPC.HTTP.HTTPoison,
+        url: rpc_url,
+        http_options: [
+          recv_timeout: :timer.minutes(10),
+          timeout: :timer.minutes(10),
+          hackney: [pool: :ethereum_jsonrpc]
+        ]
+      ]
+    ]
   end
 end

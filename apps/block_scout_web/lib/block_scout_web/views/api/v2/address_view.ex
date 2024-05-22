@@ -11,6 +11,7 @@ defmodule BlockScoutWeb.API.V2.AddressView do
   alias Explorer.Chain.Address.Counters
   alias Explorer.Chain.SmartContract.Proxy.Models.Implementation
   alias Explorer.Chain.Token.Instance
+  alias Explorer.Chain.PlatonAppchain.L2Validator
 
   @api_true [api?: true]
 
@@ -145,7 +146,11 @@ defmodule BlockScoutWeb.API.V2.AddressView do
       "has_token_transfers" => Counters.check_if_token_transfers_at_address(address.hash, @api_true),
       "watchlist_address_id" => Chain.select_watchlist_address_id(get_watchlist_id(conn), address.hash),
       "has_beacon_chain_withdrawals" => Counters.check_if_withdrawals_at_address(address.hash, @api_true)
-    })
+    }
+    |> check_validator_owner(address.hash)
+    |> check_validator_account(address.hash)
+    |> add_total_assets_staked(address.hash)
+    )
   end
 
   defp single_implementation(implementation_addresses, implementation_names) do
@@ -281,5 +286,38 @@ defmodule BlockScoutWeb.API.V2.AddressView do
       token_instance: token_instance,
       token: token
     })
+  end
+
+  defp check_validator_owner(address,address_hash) do
+    if System.get_env("CHAIN_TYPE") == "platon_appchain" do
+      # 判断地址是否是validator owner hash
+      owner_count  = L2Validator.count_by_owner_hash(address_hash)
+      if owner_count > 0 do
+        address = address |> Map.put("owner_address", true)
+      end
+    else
+      address
+    end
+  end
+
+  defp check_validator_account(address,address_hash) do
+    if System.get_env("CHAIN_TYPE") == "platon_appchain" do
+      # 判断地址是否是validator hash
+      owner_count  = L2Validator.count_by_validator_hash(address_hash)
+      if owner_count > 0 do
+        address = address |> Map.put("validator_address", true)
+      end
+    else
+      address
+    end
+  end
+
+  defp add_total_assets_staked(address,address_hash) do
+    if System.get_env("CHAIN_TYPE") == "platon_appchain" do
+      total_assets_staked = L2Validator.get_validator_total_assets_staked(address_hash)
+      address = address |> Map.put("total_assets_staked", total_assets_staked)
+    else
+      address
+    end
   end
 end

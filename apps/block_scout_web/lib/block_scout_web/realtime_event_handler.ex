@@ -1,6 +1,7 @@
 defmodule BlockScoutWeb.RealtimeEventHandler do
   @moduledoc """
   Subscribing process for broadcast events from realtime.
+  功能：负责订阅和处理来自实时流的广播事件，并通过 Notifier 模块处理这些事件
   """
 
   use GenServer
@@ -30,6 +31,8 @@ defmodule BlockScoutWeb.RealtimeEventHandler do
     Subscriber.to(:fetched_bytecode, :on_demand)
     Subscriber.to(:eth_bytecode_db_lookup_started, :on_demand)
     Subscriber.to(:zkevm_confirmed_batches, :realtime)
+    Subscriber.to(:l1_to_l2_txn, :realtime)
+    Subscriber.to(:l2_to_l1_txn, :realtime)
     # Does not come from the indexer
     Subscriber.to(:exchange_rate)
     Subscriber.to(:transaction_stats)

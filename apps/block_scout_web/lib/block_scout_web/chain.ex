@@ -403,6 +403,20 @@ defmodule BlockScoutWeb.Chain do
     end
   end
 
+  def paging_options(%{
+    "start_block_number" => start_block_number_string,
+    "end_block_number" => end_block_number_string
+  })
+      when is_binary(start_block_number_string) and is_binary(end_block_number_string) do
+    with {start_block_number, ""} <- Integer.parse(start_block_number_string),
+         {end_block_number, ""} <- Integer.parse(end_block_number_string) do
+      [paging_options: %{@default_paging_options | key: {start_block_number, end_block_number}}]
+    else
+      _ ->
+        [paging_options: @default_paging_options]
+    end
+  end
+
   def paging_options(%{"smart_contract_id" => id_str} = params) do
     transactions_count = parse_integer(params["tx_count"])
     coin_balance = parse_integer(params["coin_balance"])
@@ -496,6 +510,33 @@ defmodule BlockScoutWeb.Chain do
     [paging_options: %{@default_paging_options | key: %{block_index: index}}]
   end
 
+  # clause for platon appchain Latest L1>l2 transactions entities pagination
+  def paging_options(%{"no" => number_string}) when is_binary(number_string) do
+    case Integer.parse(number_string) do
+      {no, ""} ->
+        [paging_options: %{@default_paging_options | key: {no}}]
+
+      _ ->
+        [paging_options: @default_paging_options]
+    end
+  end
+
+  def paging_options(%{"validator_hash" => validator_hash_string}) when is_binary(validator_hash_string) do
+    with {:ok, validator_hash} <- string_to_address_hash(validator_hash_string) do
+      [paging_options: %{@default_paging_options | key: {validator_hash}}]
+    else
+      _ ->
+        [paging_options: @default_paging_options]
+    end
+  end
+
+  def paging_options_validator_event(validator_hash, block_number) do
+    case block_number == 0 do
+      true -> [paging_options: %{@default_paging_options | key: {validator_hash}}]
+      _ -> [paging_options: %{@default_paging_options | key: {validator_hash, block_number}}]
+    end
+  end
+
   def paging_options(_params), do: [paging_options: @default_paging_options]
 
   def put_key_value_to_paging_options([paging_options: paging_options], key, value) do
@@ -535,7 +576,7 @@ defmodule BlockScoutWeb.Chain do
       {timestamp_int, ""} ->
         timestamp =
           timestamp_int
-          |> DateTime.from_unix!(:second)
+          |> Helper.from_unix()
 
         {:ok, timestamp}
 
@@ -634,6 +675,10 @@ defmodule BlockScoutWeb.Chain do
   end
 
   defp paging_params(%Block{number: number}) do
+    %{"block_number" => number}
+  end
+
+  defp paging_params(%{number: number}) do
     %{"block_number" => number}
   end
 
@@ -744,6 +789,16 @@ defmodule BlockScoutWeb.Chain do
   # clause for Polygon Edge Deposits and Withdrawals
   defp paging_params(%{msg_id: msg_id}) do
     %{"id" => msg_id}
+  end
+
+  # clause for platon appchain l1->l2
+  defp paging_params(%{event_id: event_id}) do
+    %{"no" => event_id}
+  end
+
+  # clause for platon appchain l2_validator_event
+  defp paging_params(%{block_number: block_number}) do
+    %{"block_number" => block_number}
   end
 
   # clause for Shibarium Deposits

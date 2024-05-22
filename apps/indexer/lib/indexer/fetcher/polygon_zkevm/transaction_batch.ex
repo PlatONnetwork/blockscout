@@ -11,6 +11,7 @@ defmodule Indexer.Fetcher.PolygonZkevm.TransactionBatch do
   import EthereumJSONRPC, only: [integer_to_quantity: 1, json_rpc: 2, quantity_to_integer: 1]
 
   alias Explorer.Chain
+  alias Explorer.Helper
   alias Explorer.Chain.Events.Publisher
   alias Explorer.Chain.PolygonZkevm.Reader
   alias Indexer.Helper
@@ -218,7 +219,7 @@ defmodule Indexer.Fetcher.PolygonZkevm.TransactionBatch do
 
         # the timestamp is undefined for unfinalized batches
         timestamp =
-          case DateTime.from_unix(quantity_to_integer(Map.get(res.result, "timestamp", 0xFFFFFFFFFFFFFFFF))) do
+          case Helper.from_unix(quantity_to_integer(Map.get(res.result, "timestamp", 0xFFFFFFFFFFFFFFFF))) do
             {:ok, ts} -> ts
             _ -> nil
           end

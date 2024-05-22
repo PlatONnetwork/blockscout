@@ -159,6 +159,16 @@ defmodule Indexer.Supervisor do
           [memory_monitor: memory_monitor, json_rpc_named_arguments: json_rpc_named_arguments]
         ]),
         configure(Indexer.Fetcher.PolygonEdge.WithdrawalExit.Supervisor, [[memory_monitor: memory_monitor]]),
+
+
+        configure(PlatonAppchain.Supervisor, [[memory_monitor: memory_monitor]]),
+        configure(Indexer.Fetcher.PlatonAppchain.L1Event.Supervisor, [[memory_monitor: memory_monitor]]),
+        configure(Indexer.Fetcher.PlatonAppchain.L1Execute.Supervisor, [[memory_monitor: memory_monitor]]),
+        configure(Indexer.Fetcher.PlatonAppchain.Checkpoint.Supervisor, [[memory_monitor: memory_monitor]]),
+        configure(Indexer.Fetcher.PlatonAppchain.L2ValidatorRank.Supervisor, [[memory_monitor: memory_monitor]]),
+        configure(Indexer.Fetcher.PlatonAppchain.DailyStats.Supervisor, [[memory_monitor: memory_monitor]]),
+
+
         configure(Indexer.Fetcher.Shibarium.L2.Supervisor, [
           [json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]
         ]),

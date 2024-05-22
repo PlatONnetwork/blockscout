@@ -44,6 +44,10 @@ defmodule Indexer.Block.Fetcher do
     TransactionActions
   }
 
+  alias Indexer.Transform.PlatonAppchain.{L2Executes, L2Events, L2ValidatorEvents, Commitments}
+  alias Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler
+  alias Indexer.Fetcher.PlatonAppchain.L2DelegatorService
+
   alias Indexer.Transform.Optimism.Withdrawals, as: OptimismWithdrawals
 
   alias Indexer.Transform.PolygonEdge.{DepositExecutes, Withdrawals}
@@ -152,6 +156,41 @@ defmodule Indexer.Block.Fetcher do
          %{token_transfers: token_transfers, tokens: tokens} = TokenTransfers.parse(logs),
          %{transaction_actions: transaction_actions} = TransactionActions.parse(logs),
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
+
+         l2_events =
+           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+             do: L2Events.parse(logs),
+             else: []
+           ),
+         l2_executes =
+           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+             do: L2Executes.parse(logs),
+             else: []
+           ),
+         l2_validator_events =
+           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+             do: L2ValidatorEvents.parse(logs, json_rpc_named_arguments),
+             else: []
+           ),
+         commitments =
+           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+             do: Commitments.parse(logs, json_rpc_named_arguments),
+             else: []
+           ),
+
+         l2_block_produced_statistics =
+           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+             do: L2SpecialBlockHandler.l2_block_produced_statistics(blocks_params),
+             else: []
+           ),
+
+         #直接upsert表：l2_delegators
+         _ =
+           if(callback_module == Indexer.Block.Realtime.Fetcher,
+             do: L2DelegatorService.refreshed_delegators(l2_validator_events, range),
+             else: []
+           ),
+
          optimism_withdrawals =
            if(callback_module == Indexer.Block.Realtime.Fetcher, do: OptimismWithdrawals.parse(logs), else: []),
          polygon_edge_withdrawals =
@@ -226,7 +265,12 @@ defmodule Indexer.Block.Fetcher do
            polygon_edge_withdrawals: polygon_edge_withdrawals,
            polygon_edge_deposit_executes: polygon_edge_deposit_executes,
            polygon_zkevm_bridge_operations: polygon_zkevm_bridge_operations,
-           shibarium_bridge_operations: shibarium_bridge_operations
+           shibarium_bridge_operations: shibarium_bridge_operations,
+           l2_events: l2_events,
+           l2_executes: l2_executes,
+           l2_validator_events: l2_validator_events,
+           commitments: commitments,
+           l2_block_produced_statistics: l2_block_produced_statistics
          },
          {:ok, inserted} <-
            __MODULE__.import(
@@ -247,6 +291,14 @@ defmodule Indexer.Block.Fetcher do
       update_addresses_cache(inserted[:addresses])
       update_uncles_cache(inserted[:block_second_degree_relations])
       update_withdrawals_cache(inserted[:withdrawals])
+
+      #      如果l2_executes不为空，推送消息给前端 begin
+      if not Enum.empty?(l2_executes) do
+        # 交易执行后才推送消息给前端（保证信息完整性）
+        Publisher.broadcast([{:l1_to_l2_txn, l2_executes}], :realtime)
+      end
+      #      如果l2_executes不为空，推送消息给前端 end
+
       result
     else
       {step, {:error, reason}} -> {:error, {step, reason}}
@@ -260,7 +312,12 @@ defmodule Indexer.Block.Fetcher do
          polygon_edge_withdrawals: polygon_edge_withdrawals,
          polygon_edge_deposit_executes: polygon_edge_deposit_executes,
          polygon_zkevm_bridge_operations: polygon_zkevm_bridge_operations,
-         shibarium_bridge_operations: shibarium_bridge_operations
+         shibarium_bridge_operations: shibarium_bridge_operations,
+          l2_events: l2_events,
+          l2_executes: l2_executes,
+          l2_validator_events: l2_validator_events,
+          commitments: commitments,
+          l2_block_produced_statistics: l2_block_produced_statistics
        }) do
     case Application.get_env(:explorer, :chain_type) do
       :ethereum ->
@@ -277,6 +334,14 @@ defmodule Indexer.Block.Fetcher do
         basic_import_options
         |> Map.put_new(:polygon_edge_withdrawals, %{params: polygon_edge_withdrawals})
         |> Map.put_new(:polygon_edge_deposit_executes, %{params: polygon_edge_deposit_executes})
+
+      :platon_appchain ->
+        basic_import_options
+        |> Map.put_new(:l2_events, %{params: l2_events})
+        |> Map.put_new(:l2_executes, %{params: l2_executes})
+        |> Map.put_new(:l2_validator_events, %{params: l2_validator_events})
+        |> Map.put_new(:commitments, %{params: commitments})
+        |> Map.put_new(:l2_block_produced_statistics, %{params: l2_block_produced_statistics})
 
       :polygon_zkevm ->
         basic_import_options

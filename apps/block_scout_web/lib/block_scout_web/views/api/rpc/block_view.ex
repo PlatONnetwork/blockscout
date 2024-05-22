@@ -34,7 +34,7 @@ defmodule BlockScoutWeb.API.RPC.BlockView do
 
     data = %{
       "blockNumber" => to_string(block.number),
-      "timeStamp" => DateTime.to_unix(block.timestamp),
+      "timeStamp" => DateTime.to_unix(block.timestamp, :millisecond),
       "blockMiner" => Hash.to_string(block.miner_hash),
       "blockReward" => reward_as_string,
       "uncles" => uncles,
@@ -51,7 +51,7 @@ defmodule BlockScoutWeb.API.RPC.BlockView do
   def render("block_reward.json", %{block: block}) do
     data = %{
       "blockNumber" => to_string(block.number),
-      "timeStamp" => DateTime.to_unix(block.timestamp),
+      "timeStamp" => DateTime.to_unix(block.timestamp, :millisecond),
       "blockMiner" => Hash.to_string(block.miner_hash),
       "blockReward" => "0",
       "uncles" => [],

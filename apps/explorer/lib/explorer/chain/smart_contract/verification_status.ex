@@ -106,7 +106,7 @@ defmodule Explorer.Chain.SmartContract.VerificationStatus do
 
       {:ok, %Hash{byte_count: 20, bytes: address_hash}} ->
         address_encoded = Base.encode16(address_hash, case: :lower)
-        timestamp = DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string(16) |> String.downcase()
+        timestamp = DateTime.utc_now() |> DateTime.to_unix(:millisecond) |> Integer.to_string(16) |> String.downcase()
         address_encoded <> timestamp
     end
   end
@@ -114,7 +114,7 @@ defmodule Explorer.Chain.SmartContract.VerificationStatus do
   def validate_uid(<<_address::binary-size(40), timestamp_hex::binary>> = uid) do
     case Integer.parse(timestamp_hex, 16) do
       {timestamp, ""} ->
-        if DateTime.utc_now() |> DateTime.to_unix() > timestamp do
+        if DateTime.utc_now() |> DateTime.to_unix(:millisecond) > timestamp do
           {:ok, uid}
         else
           :error

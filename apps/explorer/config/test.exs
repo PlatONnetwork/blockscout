@@ -56,6 +56,7 @@ config :explorer, Explorer.Repo.Account,
 for repo <- [
       Explorer.Repo.Beacon,
       Explorer.Repo.Optimism,
+      Explorer.Repo.PlatonAppchain,
       Explorer.Repo.PolygonEdge,
       Explorer.Repo.PolygonZkevm,
       Explorer.Repo.ZkSync,

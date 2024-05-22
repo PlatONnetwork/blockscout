@@ -29,6 +29,7 @@ defmodule Explorer.Chain.Search do
     Transaction,
     UserOperation
   }
+  alias Explorer.Chain.PlatonAppchain.L2Validator
 
   @doc """
     Search function used in web interface. Returns paginated search results
@@ -88,6 +89,7 @@ defmodule Explorer.Chain.Search do
     labels_query = search_label_query(term)
     address_query = search_address_query(string)
     block_query = search_block_query(string)
+    validator_query = search_validator_query(string)
 
     basic_query =
       from(
@@ -97,6 +99,10 @@ defmodule Explorer.Chain.Search do
       )
 
     cond do
+      validator_query ->
+        basic_query
+        |> union(^validator_query)
+
       address_query ->
         basic_query
         |> union(^address_query)
@@ -410,6 +416,40 @@ defmodule Explorer.Chain.Search do
     end
   end
 
+  defp search_validator_query(term) do
+    case Chain.string_to_address_hash(term) do
+      {:ok, address_hash} ->
+        from(l2Validator in L2Validator,
+          where: l2Validator.validator_hash == ^address_hash,
+          select: %{
+            address_hash: l2Validator.validator_hash,
+            tx_hash: nil,
+            block_hash: nil,
+            type: "validator",
+            name: l2Validator.name,
+            symbol: ^nil,
+            holder_count: ^nil,
+            inserted_at: l2Validator.inserted_at,
+            block_number: 0,
+            icon_url: nil,
+            token_type: nil,
+            timestamp: fragment("NULL::timestamp without time zone"),
+            verified: nil,
+            exchange_rate: nil,
+            total_supply: nil,
+            circulating_market_cap: nil,
+            priority: 0,
+            is_verified_via_admin_panel: nil,
+            owner_hash: fragment("CONCAT('0x', encode(CAST(? AS bytea), 'hex'))", l2Validator.owner_hash),
+            logo: l2Validator.logo,
+            status:  fragment("CAST(? AS text)", l2Validator.status)
+          }
+        )
+      _ ->
+        nil
+    end
+  end
+
   defp search_tx_query(term) do
     if DenormalizationHelper.transactions_denormalization_finished?() do
       transaction_search_fields =
@@ -666,7 +706,10 @@ defmodule Explorer.Chain.Search do
       total_supply: nil,
       circulating_market_cap: nil,
       priority: 0,
-      is_verified_via_admin_panel: nil
+      is_verified_via_admin_panel: nil,
+      owner_hash: nil,
+      logo: nil,
+      status: nil
     }
   end
 end

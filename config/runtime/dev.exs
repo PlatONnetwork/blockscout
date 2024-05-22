@@ -36,6 +36,7 @@ config :block_scout_web, BlockScoutWeb.Endpoint,
 
 database = if System.get_env("DATABASE_URL"), do: nil, else: "explorer_dev"
 hostname = if System.get_env("DATABASE_URL"), do: nil, else: "localhost"
+db_username = System.get_env("DATABASE_USERNAME", "dev_user")
 
 pool_size =
   if System.get_env("DATABASE_READ_ONLY_API_URL"),
@@ -48,6 +49,8 @@ queue_target = ConfigHelper.parse_integer_env_var("DATABASE_QUEUE_TARGET", 50)
 config :explorer, Explorer.Repo,
   database: database,
   hostname: hostname,
+  username: db_username,
+  password: "123456",
   url: System.get_env("DATABASE_URL"),
   pool_size: pool_size,
   queue_target: queue_target
@@ -59,6 +62,8 @@ hostname_api = if System.get_env("DATABASE_READ_ONLY_API_URL"), do: nil, else: h
 config :explorer, Explorer.Repo.Replica1,
   database: database_api,
   hostname: hostname_api,
+  username: db_username,
+  password: "123456",
   url: ExplorerConfigHelper.get_api_db_url(),
   pool_size: ConfigHelper.parse_integer_env_var("POOL_SIZE_API", 10),
   queue_target: queue_target
@@ -70,6 +75,8 @@ hostname_account = if System.get_env("ACCOUNT_DATABASE_URL"), do: nil, else: hos
 config :explorer, Explorer.Repo.Account,
   database: database_account,
   hostname: hostname_account,
+  username: db_username,
+  password: "123456",
   url: ExplorerConfigHelper.get_account_db_url(),
   pool_size: ConfigHelper.parse_integer_env_var("ACCOUNT_POOL_SIZE", 10),
   queue_target: queue_target
@@ -97,6 +104,17 @@ config :explorer, Explorer.Repo.Optimism,
   database: database,
   hostname: hostname,
   url: System.get_env("DATABASE_URL"),
+  pool_size: 1
+
+# Configure PlatonAppchain database
+config :explorer, Explorer.Repo.PlatonAppchain,
+  database: database,
+  hostname: hostname,
+  username: db_username,
+  password: "123456",
+  url: System.get_env("DATABASE_URL"),
+   # actually this repo is not started, and its pool size remains unused.
+   # separating repos for different CHAIN_TYPE is implemented only for the sake of keeping DB schema update relevant to the current chain type
   pool_size: 1
 
 # Configure PolygonEdge database

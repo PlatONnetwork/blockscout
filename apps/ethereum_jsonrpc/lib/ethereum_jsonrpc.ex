@@ -42,6 +42,7 @@ defmodule EthereumJSONRPC do
     Utility.RangesHelper,
     Variant
   }
+  alias Explorer.Helper
 
   @default_throttle_timeout :timer.minutes(2)
 
@@ -561,7 +562,21 @@ defmodule EthereumJSONRPC do
         nil
 
       quantity ->
-        Timex.from_unix(quantity)
+        Helper.from_unix(quantity)
+    end
+  end
+
+  @doc """
+  Converts `t:timestamp/0` to `t:quantity/0`
+  时间转成DateTime.t精度会丢失，所以此处理返回13位或者10位数字
+  """
+  def timestamp_to_datetime_unix(timestamp) do
+    case quantity_to_integer(timestamp) do
+      nil ->
+        nil
+
+      quantity ->
+        quantity
     end
   end
 

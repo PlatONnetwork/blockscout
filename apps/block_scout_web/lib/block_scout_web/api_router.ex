@@ -238,6 +238,8 @@ defmodule BlockScoutWeb.ApiRouter do
       get("/:address_hash_param/withdrawals", V2.AddressController, :withdrawals)
       get("/:address_hash_param/nft", V2.AddressController, :nft_list)
       get("/:address_hash_param/nft/collections", V2.AddressController, :nft_collections)
+      get("/:address_hash_param/delegations", V2.AddressController, :delegations)
+      get("/:address_hash_param/validators", V2.AddressController, :validators)
     end
 
     scope "/tokens" do
@@ -256,6 +258,21 @@ defmodule BlockScoutWeb.ApiRouter do
       get("/:address_hash_param/instances/:token_id/transfers", V2.TokenController, :transfers_by_instance)
       get("/:address_hash_param/instances/:token_id/holders", V2.TokenController, :holders_by_instance)
       get("/:address_hash_param/instances/:token_id/transfers-count", V2.TokenController, :transfers_count_by_instance)
+    end
+
+    # 验证人相关接口（待调整）
+    scope "/validators" do
+      get("/stats", V2.PlatonAppchainValidatorController, :stats) # 验证人统计信息
+      get("/all", V2.PlatonAppchainValidatorController, :list_all_validators) # 获取所有节点（包括出块验证人，候选共识节点，质押节点）
+      get("/active", V2.PlatonAppchainValidatorController, :list_active_validators) # 获取所有候选共识节点
+      get("/candidate", V2.PlatonAppchainValidatorController, :list_candidate_validators) # 获取所有质押节点
+      get("/history", V2.PlatonAppchainValidatorController, :list_history_validators) # 分页获取历史验证人列表
+      get("/staking", V2.L2ValidatorController, :staking) # 验证人质押
+      get("/blocks-produced", V2.L2ValidatorController, :blocks_produced) # 出块记录
+      get("/validator-action", V2.L2ValidatorController, :validator_action) # 验证人操作事件
+      get("/delegator", V2.L2ValidatorController, :delegator) # 委托记录(取数据逻辑待讨论)
+      put("/verification/", V2.L2ValidatorController, :update_verification) #提交验证人信息
+      get("/:validator_hash_param", V2.L2ValidatorController, :validator_details) # 获取验证人详情
     end
 
     scope "/main-page" do
@@ -310,6 +327,21 @@ defmodule BlockScoutWeb.ApiRouter do
         get("/deposits/count", V2.PolygonEdgeController, :deposits_count)
         get("/withdrawals", V2.PolygonEdgeController, :withdrawals)
         get("/withdrawals/count", V2.PolygonEdgeController, :withdrawals_count)
+      end
+    end
+
+    # platon_appchain
+    scope "/platon-appchain" do
+      if System.get_env("CHAIN_TYPE") == "platon_appchain" do
+        get("/deposits", V2.PlatonAppchainController, :deposits)
+        get("/deposits/count", V2.PlatonAppchainController, :deposits_count)
+        get("/deposits-batches", V2.PlatonAppchainController, :deposits_batches)
+        get("/deposits-batches/count", V2.PlatonAppchainController, :deposits_batches_count)
+        get("/withdrawals", V2.PlatonAppchainController, :withdrawals)
+        get("/withdrawals/count", V2.PlatonAppchainController, :withdrawals_count)
+        get("/withdrawals-batches", V2.PlatonAppchainController, :withdrawals_batches)
+        get("/withdrawals-batches/count", V2.PlatonAppchainController, :withdrawals_batches_count)
+        get("/withdrawals/batches-tx", V2.PlatonAppchainController, :withdrawals_batches_tx)
       end
     end
 

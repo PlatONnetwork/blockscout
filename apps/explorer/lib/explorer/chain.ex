@@ -40,6 +40,7 @@ defmodule Explorer.Chain do
   alias Explorer.Counters.{LastFetchedCounter, TokenHoldersCounter, TokenTransfersCounter}
 
   alias Explorer.Chain
+  alias Explorer.Helper
 
   alias Explorer.Chain.{
     Address,
@@ -63,8 +64,9 @@ defmodule Explorer.Chain do
     Token.Instance,
     TokenTransfer,
     Transaction,
-    Wei,
-    Withdrawal
+    Wei
+    #,
+    #Withdrawal
   }
 
   alias Explorer.Chain.Cache.{
@@ -92,6 +94,10 @@ defmodule Explorer.Chain do
   alias Explorer.{PagingOptions, Repo}
 
   alias Dataloader.Ecto, as: DataloaderEcto
+
+  alias Explorer.Chain.PlatonAppchain.{
+    L2Validator
+  }
 
   @default_paging_options %PagingOptions{page_size: 50}
 
@@ -4079,11 +4085,11 @@ defmodule Explorer.Chain do
 
       min_block_unix_timestamp =
         min_block_timestamp
-        |> Timex.to_unix()
+        |>  DateTime.to_unix(:millisecond)
 
       max_block_unix_timestamp =
         max_block_timestamp
-        |> Timex.to_unix()
+        |>  DateTime.to_unix(:millisecond)
 
       blocks_delta = max_block_number - min_block_number
 
@@ -4173,7 +4179,7 @@ defmodule Explorer.Chain do
   end
 
   defp add_date_to_balance(balance, date) do
-    formatted_date = Timex.from_unix(date)
+    formatted_date = Helper.from_unix(date)
     %{balance | block_timestamp: formatted_date}
   end
 
@@ -5355,5 +5361,43 @@ defmodule Explorer.Chain do
   @spec default_paging_options() :: map()
   def default_paging_options do
     @default_paging_options
+  end
+
+
+
+  @doc """
+  简单获取验证人,返回值需要指定（待处理）
+  """
+  @spec list_l2Validators([paging_options | necessity_by_association_option | api?]) :: [L2Validator.t()]
+  def list_l2Validators(options \\ [])  do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+    paging_options = Keyword.get(options, :paging_options) || @default_paging_options
+    validator_type = Keyword.get(options, :validator_type, "All")
+
+    fetch_L2Validators(validator_type, paging_options, necessity_by_association, options)
+
+    #    fetch_L2Validators(options)
+  end
+
+
+  defp fetch_L2Validators(validator_type, paging_options, necessity_by_association, options) do
+    L2Validator
+    #    |> page_validators(paging_options)
+    |> limit(^paging_options.page_size)
+    |> order_by(desc: :rank)
+      #    |> join_associations(necessity_by_association)
+    |> select_repo(options).all()
+  end
+
+
+  defp page_validators(query, %PagingOptions{key: nil}), do: query
+
+  defp page_validators(query, %PagingOptions{key: {rank}}) do
+    where(query, [validator], validator.rank < ^rank)
+  end
+
+  def get_max_block_number() do
+    Block.query_max_block_number()
+    |> select_repo([]).one()
   end
 end

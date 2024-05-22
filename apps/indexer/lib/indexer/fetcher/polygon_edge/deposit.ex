@@ -11,7 +11,7 @@ defmodule Indexer.Fetcher.PolygonEdge.Deposit do
   require Logger
 
   import EthereumJSONRPC, only: [quantity_to_integer: 1]
-  import Explorer.Helper, only: [decode_data: 2]
+  import Explorer.Helper, only: [decode_data: 2, from_unix: 1]
 
   alias ABI.TypeDecoder
   alias EthereumJSONRPC.Block.ByNumber
@@ -127,7 +127,7 @@ defmodule Indexer.Fetcher.PolygonEdge.Deposit do
     |> get_blocks_by_events(json_rpc_named_arguments, Helper.infinite_retries_number())
     |> Enum.reduce(%{}, fn block, acc ->
       block_number = quantity_to_integer(Map.get(block, "number"))
-      {:ok, timestamp} = DateTime.from_unix(quantity_to_integer(Map.get(block, "timestamp")))
+      {:ok, timestamp} = from_unix(quantity_to_integer(Map.get(block, "timestamp")))
       Map.put(acc, block_number, timestamp)
     end)
   end

@@ -51,6 +51,17 @@ defmodule Explorer.Chain.Import.Stage.BlockReferencing do
     Runner.ZkSync.BatchBlocks
   ]
 
+  @platon_appchain_runners [
+    Runner.PlatonAppchain.L1Events,
+    Runner.PlatonAppchain.L1Executes,
+    Runner.PlatonAppchain.L2Events,
+    Runner.PlatonAppchain.L2Executes,
+    Runner.PlatonAppchain.Commitments,
+    Runner.PlatonAppchain.Checkpoints,
+    Runner.PlatonAppchain.L2ValidatorEvents,
+    Runner.PlatonAppchain.L2BlockProducedStatistics
+  ]
+
   @shibarium_runners [
     Runner.Shibarium.BridgeOperations
   ]
@@ -67,6 +78,9 @@ defmodule Explorer.Chain.Import.Stage.BlockReferencing do
 
       :polygon_edge ->
         @default_runners ++ @polygon_edge_runners
+
+      :platon_appchain ->
+        @default_runners ++ @platon_appchain_runners
 
       :polygon_zkevm ->
         @default_runners ++ @polygon_zkevm_runners

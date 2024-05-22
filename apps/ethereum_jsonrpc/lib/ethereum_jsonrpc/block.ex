@@ -4,7 +4,7 @@ defmodule EthereumJSONRPC.Block do
   and [`eth_getBlockByNumber`](https://github.com/ethereum/wiki/wiki/JSON-RPC/e8e0771b9f3677693649d945956bc60e886ceb2b#eth_getblockbynumber).
   """
 
-  import EthereumJSONRPC, only: [quantity_to_integer: 1, timestamp_to_datetime: 1]
+  import EthereumJSONRPC, only: [quantity_to_integer: 1, timestamp_to_datetime: 1, timestamp_to_datetime_unix: 1]
 
   alias EthereumJSONRPC.{Transactions, Uncles, Withdrawals}
 
@@ -55,7 +55,9 @@ defmodule EthereumJSONRPC.Block do
           total_difficulty: non_neg_integer(),
           transactions_root: EthereumJSONRPC.hash(),
           uncles: [EthereumJSONRPC.hash()],
-          base_fee_per_gas: non_neg_integer()
+          base_fee_per_gas: non_neg_integer(),
+          withdrawals_root: EthereumJSONRPC.hash(), # 是否需要？
+          block_reward: non_neg_integer()
         }
 
   @typedoc """
@@ -195,6 +197,7 @@ defmodule EthereumJSONRPC.Block do
         state_root: "0xc196ad59d867542ef20b29df5f418d07dc7234f4bc3d25260526620b7958a8fb",
         timestamp: Timex.parse!("2017-12-15T21:03:30Z", "{ISO:Extended:Z}"),
         total_difficulty: 340282366920938463463374607431465668165,
+        block_reward: 0,
         transactions_root: "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",\
   #{case Application.compile_env(:explorer, :chain_type) do
     :rsk -> """
@@ -237,7 +240,7 @@ defmodule EthereumJSONRPC.Block do
       ...>     "totalDifficulty" => 1039309006117,
       ...>     "transactions" => [],
       ...>     "transactionsRoot" => "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
-      ...>     "uncles" => []
+      ...>     "uncles" => [],
       ...>   }
       ...> )
       %{
@@ -258,6 +261,7 @@ defmodule EthereumJSONRPC.Block do
         state_root: "0x6fd0a5d82ca77d9f38c3ebbde11b11d304a5fcf3854f291df64395ab38ed43ba",
         timestamp: Timex.parse!("2015-07-30T15:32:07Z", "{ISO:Extended:Z}"),
         total_difficulty: 1039309006117,
+        block_reward: 0,
         transactions_root: "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",\
   #{case Application.compile_env(:explorer, :chain_type) do
     :rsk -> """
@@ -286,7 +290,7 @@ defmodule EthereumJSONRPC.Block do
 
   defp do_elixir_to_params(
          %{
-           "difficulty" => difficulty,
+#           "difficulty" => difficulty,
            "extraData" => extra_data,
            "gasLimit" => gas_limit,
            "gasUsed" => gas_used,
@@ -296,18 +300,18 @@ defmodule EthereumJSONRPC.Block do
            "number" => number,
            "parentHash" => parent_hash,
            "receiptsRoot" => receipts_root,
-           "sha3Uncles" => sha3_uncles,
+#           "sha3Uncles" => sha3_uncles,
            "size" => size,
            "stateRoot" => state_root,
            "timestamp" => timestamp,
-           "totalDifficulty" => total_difficulty,
+#           "totalDifficulty" => total_difficulty,
            "transactionsRoot" => transactions_root,
-           "uncles" => uncles,
+#           "uncles" => uncles,
            "baseFeePerGas" => base_fee_per_gas
          } = elixir
        ) do
     %{
-      difficulty: difficulty,
+#      difficulty: difficulty,
       extra_data: extra_data,
       gas_limit: gas_limit,
       gas_used: gas_used,
@@ -319,14 +323,17 @@ defmodule EthereumJSONRPC.Block do
       number: number,
       parent_hash: parent_hash,
       receipts_root: receipts_root,
-      sha3_uncles: sha3_uncles,
+#      sha3_uncles: sha3_uncles,
       size: size,
       state_root: state_root,
       timestamp: timestamp,
-      total_difficulty: total_difficulty,
+#      total_difficulty: total_difficulty,
       transactions_root: transactions_root,
-      uncles: uncles,
-      base_fee_per_gas: base_fee_per_gas
+#      uncles: uncles,
+      base_fee_per_gas: base_fee_per_gas,
+      withdrawals_root: "0x0",
+        #Map.get(elixir, "withdrawalsRoot", "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"),
+      block_reward: 0
     }
   end
 
@@ -370,7 +377,10 @@ defmodule EthereumJSONRPC.Block do
       timestamp: timestamp,
       transactions_root: transactions_root,
       uncles: uncles,
-      base_fee_per_gas: base_fee_per_gas
+      base_fee_per_gas: base_fee_per_gas,
+      withdrawals_root: "0x0",
+        #Map.get(elixir, "withdrawalsRoot", "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"),
+      block_reward: 0
     }
   end
 
@@ -414,7 +424,10 @@ defmodule EthereumJSONRPC.Block do
       timestamp: timestamp,
       total_difficulty: total_difficulty,
       transactions_root: transactions_root,
-      uncles: uncles
+      uncles: uncles,
+      withdrawals_root:
+        Map.get(elixir, "withdrawalsRoot", "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"),
+      block_reward: 0
     }
   end
 

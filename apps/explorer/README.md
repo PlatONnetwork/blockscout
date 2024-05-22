@@ -36,3 +36,8 @@ To get BlockScout up and running locally:
 * Reset the test database: `MIX_ENV=test mix do ecto.drop, ecto.create, ecto.migrate`
 * Change `tag` in `benchmarks/explorer/chain/recent_collated_transactions.exs` to a new value, so that it will compare against the old values saved in `benchmarks/explorer/chain/recent_collated_transactions.benchee`
 * Run the benchmark: `MIX_ENV=test mix run benchmarks/explorer/chain/recent_collated_transactions.exs`
+
+### create migration
+* `cd .\apps\explorer\`  and `run mix ecto.gen.migration create_l2_validators`
+* 执行指定目录的migration `mix ecto.migrate --migrations-path priv/platon_appchain/migrations`
+  

@@ -39,6 +39,13 @@ defmodule Explorer.Chain.Block.Schema do
                             2
                           )
 
+                        :platon_appchain ->
+                          elem(
+                            quote do
+                              field(:block_reward, Wei)
+                            end,
+                            2
+                          )
                         _ ->
                           []
                       end)
@@ -118,7 +125,7 @@ defmodule Explorer.Chain.Block do
                             &1
                         end)).()
 
-  @required_attrs ~w(consensus gas_limit gas_used hash miner_hash nonce number parent_hash timestamp)a
+  @required_attrs ~w(consensus gas_limit gas_used hash miner_hash block_reward nonce number parent_hash timestamp)a
 
   @typedoc """
   How much work is required to find a hash with some number of leading 0s.  It is measured in hashes for PoW
@@ -443,4 +450,12 @@ defmodule Explorer.Chain.Block do
   end
 
   def set_refetch_needed(block_number), do: set_refetch_needed([block_number])
+
+  def query_max_block_number() do
+    from(b in __MODULE__,
+      select: %{
+        block_number: coalesce(max(b.number), 0)
+      }
+    )
+  end
 end
