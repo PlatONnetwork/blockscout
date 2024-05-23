@@ -158,28 +158,28 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
 
          l2_events =
-           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+           if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              do: L2Events.parse(logs),
              else: []
            ),
          l2_executes =
-           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+           if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              do: L2Executes.parse(logs),
              else: []
            ),
          l2_validator_events =
-           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+           if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              do: L2ValidatorEvents.parse(logs, json_rpc_named_arguments),
              else: []
            ),
          commitments =
-           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+           if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              do: Commitments.parse(logs, json_rpc_named_arguments),
              else: []
            ),
 
          l2_block_produced_statistics =
-           if(Application.get_env(:explorer, :chain_type) == "platon_appchain",
+           if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              do: L2SpecialBlockHandler.l2_block_produced_statistics(blocks_params),
              else: []
            ),
