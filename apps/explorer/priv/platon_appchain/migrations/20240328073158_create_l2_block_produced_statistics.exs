@@ -7,14 +7,14 @@ defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL2BlockProducedStatistic
   # 注意：
   #     如果此round某个验证人因为各种原因，没有出块，底层rpc接口的返回数据中，也应包括此验证人，实际出库数=0即可。如果不返回，那就麻烦了，还需要再通过rpc获取这个round的验证人列表，然后合并两次rpc的结果。
 
-  # 有了这些数据，即可计算验证人的出块率，计算方法（计算最近最多7个epoch的出块率）：
+  # 有了这些数据，即可计算验证人的出块率，计算方法（计算最近最多7个epoch（需要折算成round数，假设是70个round）的出块率）：
   #     select round(cast(sum(t.actual_blocks) / sum(t.should_blocks),2)
   #     from (
   #       select actual_blocks, should_blocks
   #       from l2_block_produced_statistics
   #       where validator_hash = '0x0102'
-  #       order by round
-  #       limit 7
+  #       order by epoch
+  #       limit 70
   #     ) t
   #
   def change do
