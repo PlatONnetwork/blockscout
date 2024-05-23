@@ -89,6 +89,10 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_epoch_size]
   end
 
+  def l2_rounds_per_epoch() do
+    div(l2_epoch_size(), l2_round_size())
+  end
+
   def l2_rpc_arguments() do
     json_rpc_named_arguments(l2_rpc_url())
   end
@@ -109,6 +113,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
   def l1_rpc_url() do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:platon_appchain_l1_rpc]
   end
+
 
   def l2_validator_contract_address() do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_validator_contract_address]
