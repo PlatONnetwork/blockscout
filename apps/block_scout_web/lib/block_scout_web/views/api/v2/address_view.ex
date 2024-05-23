@@ -295,6 +295,7 @@ defmodule BlockScoutWeb.API.V2.AddressView do
       if owner_count > 0 do
         address = address |> Map.put("owner_address", true)
       end
+      address
     else
       address
     end
@@ -307,6 +308,7 @@ defmodule BlockScoutWeb.API.V2.AddressView do
       if owner_count > 0 do
         address = address |> Map.put("validator_address", true)
       end
+      address
     else
       address
     end
@@ -316,6 +318,7 @@ defmodule BlockScoutWeb.API.V2.AddressView do
     if System.get_env("CHAIN_TYPE") == "platon_appchain" do
       total_assets_staked = L2Validator.get_validator_total_assets_staked(address_hash)
       address = address |> Map.put("total_assets_staked", total_assets_staked)
+      address
     else
       address
     end
