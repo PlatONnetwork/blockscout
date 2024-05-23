@@ -77,24 +77,6 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2BlockProducedStatistics 
         :l2_block_produced_statistics
       )
     end)
-
-
-    # todo: 继续执行更新出块率的SQL
-    #update l2_validators dest
-    #set block_rate = src.block_rate
-    #from (
-    #	SELECT validator_hash, round(round(sum(actual_blocks) / sum(should_blocks), 4) * 10000, 0) as block_rate
-    #	from (
-    #		select validator_hash, should_blocks, actual_blocks, round, ROW_NUMBER() over(partition by validator_hash order by round desc) as row_num
-    #		from l2_block_produced_statistics
-    #		where validator_hash in (E'\\x1dd26dfb60b996fd5d5152af723949971d9119ee', E'\\x343972bf63d1062761aaaa891d2750f03cb4b2f7')
-    #	) sorted
-    #	where sorted.row_num < 8
-    #	group by validator_hash
-    #) src
-    #where dest.validator_hash = src.validator_hash
-
-    # https://stackoverflow.com/questions/68880594/ecto-update-query-using-value-from-a-subquery
   end
 
 
@@ -144,7 +126,24 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2BlockProducedStatistics 
     )
   end
 
+  #update l2_validators dest
+  #set block_rate = src.block_rate
+  #from (
+  #	SELECT validator_hash, round(round(sum(actual_blocks) / sum(should_blocks), 4) * 10000, 0) as block_rate
+  #	from (
+  #		select validator_hash, should_blocks, actual_blocks, round, ROW_NUMBER() over(partition by validator_hash order by round desc) as row_num
+  #		from l2_block_produced_statistics
+  #		where validator_hash in (E'\\x1dd26dfb60b996fd5d5152af723949971d9119ee', E'\\x343972bf63d1062761aaaa891d2750f03cb4b2f7')
+  #	) sorted
+  #	where sorted.row_num < 8
+  #	group by validator_hash
+  #) src
+  #where dest.validator_hash = src.validator_hash
+
+  # https://stackoverflow.com/questions/68880594/ecto-update-query-using-value-from-a-subquer
   defp update_l2_validators_block_rate(repo, validator_hash_list, %{timeout: timeout, timestamps: %{updated_at: updated_at}}) when is_list(validator_hash_list) do
+    # 线序观察7个结算周期，折算成共识周期数
+    total_rounds = PlatonAppchain.l2_rounds_per_epoch() * 7
 
     # 说明：row_number() |> over(partition_by: s.validator_hash, order_by: [desc: s.round])
     # 也可以写成：over(row_number(), partition_by: s.validator_hash, order_by: [desc: s.round])，在窗口中执行函数row_number(), 分区标准是s.validator_hash，排序是s.round的倒叙
@@ -153,7 +152,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2BlockProducedStatistics 
     subquery_1 = from(s in Explorer.Chain.PlatonAppchain.L2BlockProducedStatistic, select: %{row_num: row_number() |> over(partition_by: s.validator_hash, order_by: [desc: s.round]), validator_hash: s.validator_hash, should_blocks: s.should_blocks, actual_blocks: s.actual_blocks})
 
     # 这个子查询，也是因为引入了一个临时列block_rate，所以其它列也要转成%{}形式
-    subquery_2 = from(s2 in subquery(subquery_1), select: %{validator_hash: s2.validator_hash, block_rate: fragment("round(?, 4)", fragment("cast(? as numeric)", sum(s2.actual_blocks)) / sum(s2.should_blocks)) * 10000}, where: s2.row_num <= 7 and s2.validator_hash in ^validator_hash_list, group_by: s2.validator_hash)
+    subquery_2 = from(s2 in subquery(subquery_1), select: %{validator_hash: s2.validator_hash, block_rate: fragment("round(?, 4)", fragment("cast(? as numeric)", sum(s2.actual_blocks)) / sum(s2.should_blocks)) * 10000}, where: s2.row_num <= ^total_rounds and s2.validator_hash in ^validator_hash_list, group_by: s2.validator_hash)
 
 
     update_from_select = from(d in Explorer.Chain.PlatonAppchain.L2Validator,
