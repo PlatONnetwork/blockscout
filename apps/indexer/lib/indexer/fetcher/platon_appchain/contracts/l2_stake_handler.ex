@@ -185,7 +185,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   # 注意：
   #     如果此round某个验证人因为各种原因，没有出块，底层rpc接口的返回数据中，也会包括此验证人，实际出库数=0即可。
   """
-  def get_blocks_of_validators(periodType, period) do
+  def getBlocksOfValidators(periodType, period) do
     # 返回
     # [
     #  {"0x343972bf63d1062761aaaa891d2750f03cb4b2f7", 90},

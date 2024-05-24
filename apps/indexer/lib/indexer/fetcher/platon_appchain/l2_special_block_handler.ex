@@ -25,7 +25,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
     if PlatonAppchain.is_round_end_block(block.number) == true do
       #epoch = PlatonAppchain.calculateL2Epoch(block.number)
       round = PlatonAppchain.calculateL2Round(block.number)
-      blocks_of_validator_list = L2StakeHandler.get_blocks_of_validators(@period_type[:round], round)
+      blocks_of_validator_list = L2StakeHandler.getBlocksOfValidators(@period_type[:round], round)
 
       get_l2_block_produced_statistic(blocks_of_validator_list,  round)
     else
