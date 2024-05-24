@@ -80,7 +80,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   def getValidators(start \\ <<>>, size \\ @default_size) do
     result = get_validators(start, size) |> Ethers.call(rpc_opts: @rpc_opts)
     {:ok, data} = result
-    Logger.debug(fn -> "getValidators: #{inspect(data)}" end , logger: :platon_appchain)
+    # Logger.debug(fn -> "getValidators: #{inspect(data)}" end , logger: :platon_appchain)
     [nextStart | validators] = data
     validatorsJson = List.first(validators) |> Enum.map(fn validator -> convertValidatorToJSON(validator) end)
     {Base.encode16(nextStart), validatorsJson}
@@ -185,7 +185,6 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   # 注意：
   #     如果此round某个验证人因为各种原因，没有出块，底层rpc接口的返回数据中，也会包括此验证人，实际出库数=0即可。
   """
-  #def getBlockProducedInfo(periodType, period) do
   def get_blocks_of_validators(periodType, period) do
     # 返回
     # [
@@ -193,7 +192,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     #  {"0x1dd26dfb60b996fd5d5152af723949971d9119ee", 80},
     #  {"0x70d207c1322ccb9069d3790d6768866dabff1035", 80}
     # ]
-    case L2StakeHandler.get_blocks_of_validators(periodType, period) |> Ethers.call(rpc_opts: @rpc_opts) do
+
+    result = get_blocks_of_validators(periodType, period) |> Ethers.call(rpc_opts: @rpc_opts)
+    case result do
       {:ok, blockProducedInfos} -> convertBlockProducedInfos(blockProducedInfos)
       _ -> []
     end

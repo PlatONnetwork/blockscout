@@ -341,7 +341,7 @@ defmodule Indexer.Block.Fetcher do
         |> Map.put_new(:l2_executes, %{params: l2_executes})
         |> Map.put_new(:l2_validator_events, %{params: l2_validator_events})
         |> Map.put_new(:commitments, %{params: commitments})
-        |> Map.put_new(:l2_block_produced_statistics, %{params: l2_block_produced_statistics})
+        # |> Map.put_new(:l2_block_produced_statistics, %{params: l2_block_produced_statistics})
 
       :polygon_zkevm ->
         basic_import_options

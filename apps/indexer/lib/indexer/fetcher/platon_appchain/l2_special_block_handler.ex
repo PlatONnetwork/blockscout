@@ -14,26 +14,30 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
   # 如果一个验证人的出库数是0，底层也会返回。
   @spec l2_block_produced_statistics(list()) :: list()
   def l2_block_produced_statistics(blocks) when is_list(blocks) do
+    statis =
       Enum.reduce(blocks, [], fn block, acc ->
-        [get_l2_block_produced_statistic_if_round_end_block(block) | acc]
+        acc ++ get_l2_block_produced_statistic_if_round_end_block(block)
       end)
   end
 
   @spec get_l2_block_produced_statistic_if_round_end_block(map()) :: list()
   defp get_l2_block_produced_statistic_if_round_end_block(block) when is_map(block) do
     if PlatonAppchain.is_round_end_block(block.number) == true do
-      epoch = PlatonAppchain.calculateL2Epoch(block.number)
+      #epoch = PlatonAppchain.calculateL2Epoch(block.number)
       round = PlatonAppchain.calculateL2Round(block.number)
       blocks_of_validator_list = L2StakeHandler.get_blocks_of_validators(@period_type[:round], round)
-      get_l2_block_produced_statistic(blocks_of_validator_list, epoch, round)
+
+      get_l2_block_produced_statistic(blocks_of_validator_list,  round)
+    else
+      []
     end
   end
 
-  defp get_l2_block_produced_statistic(blocks_of_validator_list, epoch, round) do
+  # 返回list[map()]
+  defp get_l2_block_produced_statistic(blocks_of_validator_list, round) do
     blocks_of_validator_list
     |> Enum.map(fn item ->
       %{
-        epoch: epoch,
         round: round,
         validator_hash: item.validator_hash,
         should_blocks: 10, #todo: 做成env的变量
