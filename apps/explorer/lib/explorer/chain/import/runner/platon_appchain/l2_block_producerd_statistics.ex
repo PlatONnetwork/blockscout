@@ -128,7 +128,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2BlockProducedStatistics 
       update: [
         set: [
           # Don't update `validator_hash` `round` as it is a primary key and used for the conflict target
-          shoud_blocks: fragment("EXCLUDED.should_blocks"),
+          should_blocks: fragment("EXCLUDED.should_blocks"),
           actual_blocks: fragment("EXCLUDED.actual_blocks"),
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", l.inserted_at), # LEAST返回给定的最小值 EXCLUDED.inserted_at 表示已存在的值
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", l.updated_at)
@@ -144,10 +144,6 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2BlockProducedStatistics 
   end
 
   defp update_l2_validators_block_rate(repo, validator_hash_list, %{timeout: timeout, timestamps: %{updated_at: updated_at}}) when is_list(validator_hash_list) do
-    {:ok, "success"}
-  end
-
-  defp update_l2_validators_block_rate_bak(repo, validator_hash_list, %{timeout: timeout, timestamps: %{updated_at: updated_at}}) when is_list(validator_hash_list) do
 
     # 说明：row_number() |> over(partition_by: s.validator_hash, order_by: [desc: s.round])
     # 也可以写成：over(row_number(), partition_by: s.validator_hash, order_by: [desc: s.round])，在窗口中执行函数row_number(), 分区标准是s.validator_hash，排序是s.round的倒叙
