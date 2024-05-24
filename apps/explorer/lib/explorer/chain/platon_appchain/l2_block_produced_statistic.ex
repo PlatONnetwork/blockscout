@@ -49,6 +49,6 @@ defmodule Explorer.Chain.PlatonAppchain.L2BlockProducedStatistic do
     module
     |> cast(attrs, @allowed_attrs)  # 确保@allowed_attrs中指定的key才会赋值到结构体中
     |> validate_required(@required_attrs)
-    |> unique_constraint(:validator_hash, :round)
+    |> unique_constraint([:validator_hash, :round])
   end
 end
