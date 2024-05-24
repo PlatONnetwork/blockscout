@@ -845,6 +845,8 @@ config :indexer, Indexer.Fetcher.PlatonAppchain.L1Event.Supervisor, enabled: Con
 config :indexer, Indexer.Fetcher.PlatonAppchain.L1Execute.Supervisor, enabled: ConfigHelper.chain_type() == :platon_appchain
 config :indexer, Indexer.Fetcher.PlatonAppchain.Checkpoint.Supervisor, enabled: ConfigHelper.chain_type() == :platon_appchain
 config :indexer, Indexer.Fetcher.PlatonAppchain.L2ValidatorRank.Supervisor, enabled: ConfigHelper.chain_type() == :platon_appchain
+config :indexer, Indexer.Fetcher.PlatonAppchain.DailyStats.Supervisor, enabled: ConfigHelper.chain_type() == :platon_appchain
+
 
 # 配置 Indexer.Fetcher.PlatonAppchain 级别的环境参数
 config :indexer, Indexer.Fetcher.PlatonAppchain,
