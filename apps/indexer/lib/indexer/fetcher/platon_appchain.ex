@@ -81,14 +81,22 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_block_reward]
   end
 
+  # 每个共识周期区块数
   def l2_round_size() do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_round_size]
   end
 
+  # 每个验证人每个共识周期应当出块数
+  def l2_round_size_per_validator() do
+    Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_round_size_per_validator]
+  end
+
+  # 每个结算周期区块数
   def l2_epoch_size() do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_epoch_size]
   end
 
+  # 每个结算周期包含多少个共识周期
   def l2_rounds_per_epoch() do
     div(l2_epoch_size(), l2_round_size())
   end
@@ -105,19 +113,14 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     System.get_env("ETHEREUM_JSONRPC_HTTP_URL")
   end
 
-  # 每个共识轮应当出块数（待调整）
-  def l2_round_block_produce() do
-    System.get_env("INDEXER_PLATON_APPCHAIN_L2_ROUND_BLOCK_PRODUCE_SIZE") || 10
-  end
-
   def l1_rpc_url() do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:platon_appchain_l1_rpc]
   end
 
 
-  def l2_validator_contract_address() do
-    Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_validator_contract_address]
-  end
+#  def l2_validator_contract_address() do
+#    Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_validator_contract_address]
+#  end
 
 
   def default_block_interval() do

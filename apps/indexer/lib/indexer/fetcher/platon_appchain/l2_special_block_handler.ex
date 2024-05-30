@@ -18,6 +18,11 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
       Enum.reduce(blocks, [], fn block, acc ->
         acc ++ get_l2_block_produced_statistic_if_round_end_block(block)
       end)
+
+    # 去掉重复的，如果有重复的，在upsert的时候，PGSql 会发生错误：ON CONFLICT DO UPDATE command cannot affect row a second time
+    # 实际上，在blockscout的所有importer中，因为是同一个事务中，所以都应该避免import的数据中有重复的。
+    # 这个只是在测试时get_l2_block_produced_statistic_if_round_end_block/1方法去掉是否是共识周期结束块的判断时，才会出现重复数据，此时，需要去重。
+    # Enum.uniq_by(statis, fn elem -> {elem.validator_hash, elem.round} end)
   end
 
   @spec get_l2_block_produced_statistic_if_round_end_block(map()) :: list()
@@ -40,7 +45,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
       %{
         round: round,
         validator_hash: item.validator_hash,
-        should_blocks: 10, #todo: 做成env的变量
+        should_blocks: PlatonAppchain.l2_round_size_per_validator(),
         actual_blocks: item.actual_blocks,
       }
     end)
