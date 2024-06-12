@@ -1,6 +1,8 @@
 defmodule BlockScoutWeb.API.V2.StatsController do
   use Phoenix.Controller
 
+  require Logger
+
   alias BlockScoutWeb.API.V2.Helper
   alias BlockScoutWeb.Chain.MarketHistoryChartController
   alias Explorer.{Chain, Market}
@@ -218,13 +220,7 @@ defmodule BlockScoutWeb.API.V2.StatsController do
       stats = stats |> Map.put("total_assets_staked", total_assets_staked)
 
       # 计算质押率
-      case  get_excitation_balance() do
-        {:ok, excitation_balance} ->
-          liq_balance =  Decimal.sub(Decimal.new(total_supply), excitation_balance)
-          staked_rate = Decimal.div(total_assets_staked,liq_balance) |> Decimal.mult(100)   # |> Decimal.to_float()
-          stats = stats |> Map.put("staked_rate", staked_rate)
-        _-> stats = stats |> Map.put("staked_rate", nil)
-      end
+      stats = get_excitation_balance(stats,Decimal.new(total_supply),total_assets_staked)
 
       # 下个checkpoint批次所在区块(取block表最大区块进行计算)
       %{block_number: block_number_value} = Chain.get_max_block_number()
@@ -237,14 +233,30 @@ defmodule BlockScoutWeb.API.V2.StatsController do
   end
 
   # 激励池余额
-  def get_excitation_balance() do
-    json_rpc_named_arguments = json_rpc_named_arguments(System.get_env("ETHEREUM_JSONRPC_HTTP_URL"))
-    l2_reward_manager_contract = json_rpc_named_arguments(System.get_env("INDEXER_PLATON_APPCHAIN_L2_REWARD_MANAGER_CONTRACT"))
+  def get_excitation_balance(stats,total_supply,total_assets_staked) do
+    json_rpc_named_arguments = json_rpc_named_arguments(System.get_env("INDEXER_PLATON_APPCHAIN_L1_RPC"))
+    l2_reward_manager_contract = System.get_env("INDEXER_PLATON_APPCHAIN_L2_REWARD_MANAGER_CONTRACT")
+    Logger.info(fn -> "l2_reward_manager_contract>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: #{inspect(l2_reward_manager_contract)}" end ,
+      logger: :platon_appchain
+    )
     address_balances = EthereumJSONRPC.fetch_balances([%{block_quantity: "latest", hash_data: l2_reward_manager_contract}], json_rpc_named_arguments)
-    balance =  case address_balances do
+    Logger.info(fn -> "address_balances>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: #{inspect(address_balances)}" end ,
+      logger: :platon_appchain
+    )
+    {_,excitation_balance} =  case address_balances do
       {:ok, %EthereumJSONRPC.FetchedBalances{params_list: [%{address_hash: address_hash_value, block_number: block_number_value, value: balance}]}} -> {:ok,Decimal.new(balance)}
-      _-> {:error, nil}
+      _-> {:error, Decimal.new("0")}
     end
+
+    liq_balance =  Decimal.sub(total_supply, excitation_balance)
+    staked_rate = Decimal.div(total_assets_staked,liq_balance) |> Decimal.mult(100)   # |> Decimal.to_float()
+    Logger.info(fn -> "staked_rate>>>>>>>>>>>>>>>>>>: #{inspect(staked_rate)}" end ,
+      logger: :platon_appchain
+    )
+    stats = stats |> Map.put("staked_rate", staked_rate)
+    # 计算总流通量
+    circulating = Decimal.sub(liq_balance, total_assets_staked)
+    stats = stats |> Map.put("circulating", circulating)
   end
 
   def next_l2_round_block_number(current_block_number) do
