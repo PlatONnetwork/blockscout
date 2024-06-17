@@ -79,6 +79,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
           pending_validator_rewards: v.pending_validator_rewards,
           name: v.name,
           status: v.status,
+          role: v.vole,
           locking_stake_amount: v.locking_stake_amount,
           withdrawal_stake_amount: v.withdrawal_stake_amount
         },
