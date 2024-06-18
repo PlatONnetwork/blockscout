@@ -89,7 +89,8 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorView do
       "name" => validator_detail.name,
       "status" => validator_detail.status,
       "unbonding" => validator_detail.locking_stake_amount,
-      "pending_withdrawal" => validator_detail.withdrawal_stake_amount
+      "pending_withdrawal" => validator_detail.withdrawal_stake_amount,
+      "role" => validator_detail.role
     }
   end
 
