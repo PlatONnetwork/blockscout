@@ -1,6 +1,8 @@
 defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateCheckPoints do
   use Ecto.Migration
 
+  # 当用户在L2上发起一些交易，需要把相应信息同步到L1时，L2会触发 L2StateSynced 事件，并被L2收集并组成一个checkpoint，提交到L1，L1收到checkpoint后，并不执行其中的交易，而是保存后等待用户在L1发起交易操作时，再再L1执行相应逻辑
+  # checkpoints表保存 checkpoint 信息
   def change do
     create table(:checkpoints, primary_key: false) do
       # l2上的epoch，一个epoch结束块高生成一个checkpoint

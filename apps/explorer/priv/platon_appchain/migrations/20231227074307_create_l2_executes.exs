@@ -1,7 +1,9 @@
 defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL2TxExecutes do
   use Ecto.Migration
 
-  # 是指L2通过监控L1上的某些事件，并在L2上执行相应业务处理
+  # 是指L2通过监控L1上的某些事件，并在L2上执行相应业务处理、
+  # L2监听L1上合约的事件，定期把监听到的事件，打包提交一个commitment合约交易到L2。验证人会重放commitment中交易逻辑，并触发StateSyncedResult事件。
+  # l2_executes表记录重放commitment中交易逻辑的结果信息
   def change do
     create table(:l2_executes, primary_key: false) do
       # 交易计数器 msgId

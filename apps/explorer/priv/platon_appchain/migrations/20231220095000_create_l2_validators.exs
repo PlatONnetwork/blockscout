@@ -9,6 +9,7 @@ defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL2Validators do
       add(:stake_epoch, :bigint, null: false)
       # 验证人owner地址
       add(:owner_hash, :bytea, null: false)
+      # commission_rate是底层链上保存的，40，表示40%，30表示30%
       # 拥金比例, 每个结算周期，每个验证人获得总奖励，首先按此CommissionRate扣除Commission，剩余的再按质押/委托金额比例分配。
       add(:commission_rate, :integer, null: true, default: 0)
       # 有效质押金额
@@ -37,11 +38,11 @@ defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL2Validators do
       add(:logo, :text, null: true)
       # 验证人官方网站
       add(:website, :string, null: true)
-      # 预估年收益率
+      # 预估年收益率，万分之一单位,
       add(:expect_apr, :integer, null: true)
       # 最近24小时出块数
       add(:produced_blocks, :bigint, null: true)
-      # 最近24小时出块率
+      # 最近24小时出块率，万分之一单位,
       add(:block_rate, :integer, null: true)
       # 是否验证 0-未验证，1-已验证
       add(:auth_status, :integer, null: false, default: 0)

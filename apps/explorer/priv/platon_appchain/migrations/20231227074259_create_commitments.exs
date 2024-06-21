@@ -1,6 +1,8 @@
 defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateCommitments do
   use Ecto.Migration
 
+  # L2监听L1上合约的事件，定期把监听到的事件，打包提交一个commitment合约交易到L2。验证人会重放commitment中交易逻辑，并触发StateSyncedResult事件。
+  # commitments表记录commitment合约交易的信息
   def change do
     create table(:commitments, primary_key: false) do
       # 交易hash
