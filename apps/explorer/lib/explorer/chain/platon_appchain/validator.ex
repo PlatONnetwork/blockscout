@@ -120,11 +120,14 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
         b in Block,
         left_join: t in Transaction,
         on: b.number == t.block_number,
-        group_by: [b.number, b.timestamp, b.size, b.gas_used, b.gas_limit, b.block_reward],
+        # 如果group_by的分组条件不是主键，则要把select中的非聚合字段，都写到group_by中
+        group_by: [b.number, b.timestamp, b.gas_used, b.gas_limit, b.block_reward],
         select: %{
           number: b.number,
           block_timestamp: b.timestamp,
-          txn: b.size,
+          #区块包含的记录数
+          #txn: b.size,
+          txn: count(t.hash),
           gas_used: b.gas_used,
           gas_limit: b.gas_limit,
           block_reward: b.block_reward,
