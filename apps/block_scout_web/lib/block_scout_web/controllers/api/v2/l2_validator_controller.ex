@@ -61,6 +61,12 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorController do
   end
 
 
+  def ws(conn, params) do
+    alias BlockScoutWeb.Endpoint
+    Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator",1)
+  end
+
+
   def validator_details(conn, %{"validator_hash_param" => address_hash_string} = params) do
     with {:format, {:ok, validator_hash_address}} <- {:format, Chain.string_to_address_hash(address_hash_string)} do
      validator_detail =  Validator.get_validator_details(validator_hash_address)
