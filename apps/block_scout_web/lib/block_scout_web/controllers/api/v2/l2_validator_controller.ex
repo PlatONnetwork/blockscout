@@ -63,7 +63,8 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorController do
 
   def ws(conn, params) do
     alias BlockScoutWeb.Endpoint
-    Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator",1)
+    Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "allvalidator",1)
+    Process.sleep(2000)
     json(
       conn,
       %{"test" => "test"}

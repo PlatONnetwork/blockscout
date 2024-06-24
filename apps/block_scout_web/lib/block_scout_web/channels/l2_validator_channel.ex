@@ -3,16 +3,18 @@ defmodule BlockScoutWeb.L2ValidatorChannel do
   Establishes pub/sub channel for change validator.
   """
   use BlockScoutWeb, :channel
+  require Logger
 
   intercept([
     "all_validator",
     "active_validator",
     "candidate_validator",
-    "history_validator"
+    "history_validator",
+    "allvalidator",
   ])
 
   def join("platon_appchain_l2_validator:all_validator", _params, socket) do
-    {:ok, %{}, socket}
+    {:ok, %{"test"=>"test"}, socket}
   end
 
   def join("platon_appchain_l2_validator:active_validator", _params, socket) do
@@ -34,12 +36,16 @@ defmodule BlockScoutWeb.L2ValidatorChannel do
 #  })
   #    test end
   def handle_out(
-        "all_validator",
+        "allvalidator",
         validatorsCount,
         %Phoenix.Socket{handler: BlockScoutWeb.UserSocketV2} = socket
       ) do
+
+    Logger.info(fn -> "hander out all_validator>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" end ,
+      logger: :platon_appchain
+    )
 #    result_validator = Enum.map(validators, fn validator -> convert_l2_validator(validator) end)
-    push(socket, "all_validator", validatorsCount)
+    push(socket, "allvalidator", validatorsCount)
     {:noreply, socket}
   end
 
