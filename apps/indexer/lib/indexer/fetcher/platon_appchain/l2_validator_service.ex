@@ -24,15 +24,15 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
     exit_info =
       cond do
-        PlatonAppchain.l2_validator_is_unstaked(validatorMap.amount) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Unstaked"}
-        PlatonAppchain.l2_validator_is_slashed(validatorMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashing"}
-        PlatonAppchain.l2_validator_is_duplicated(validatorMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Duplicated"}
-        PlatonAppchain.l2_validator_is_lowBlocks(validatorMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowBlocks"}
-        PlatonAppchain.l2_validator_is_lowThreshold(validatorMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowThreshold"}
+        PlatonAppchain.l2_validator_is_unstaked(validatorInfoMap.amount) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Unstaked"}
+        PlatonAppchain.l2_validator_is_slashed(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashing"}
+        PlatonAppchain.l2_validator_is_duplicated(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Duplicated"}
+        PlatonAppchain.l2_validator_is_lowBlocks(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowBlocks"}
+        PlatonAppchain.l2_validator_is_lowThreshold(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowThreshold"}
         true -> %{}
       end
-    Map.merge(validatorMap, exit_info)
-    L2Validator.update_validator(repo, validatorMap)
+    Map.merge(validatorInfoMap, exit_info)
+    L2Validator.update_validator(repo, validatorInfoMap)
   end
 
   @spec increase_stake(binary(), integer()) :: {:ok, L2Validator.t()} | {:error, reason :: String.t()}
