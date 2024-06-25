@@ -68,12 +68,18 @@ defmodule Indexer.Fetcher.PlatonAppchain do
   @default_block_interval 1000
   @block_check_interval_range_size 100
 
-  # 0-candidate(质押节点) 1-active(201共识节点后续人) 2-verifying(43共识节点)
-  @l2_validator_role %{Active: 0, Verifying: 1, Candidate: 2}
+  # 0-candidate(质押节点) 1-active(201共识节点后续人) 2-Consensus(43共识节点)
+  # @l2_validator_role %{Candidate: 0, Active: 1, Consensus : 2}
+  # 目前，前端展示只需要展示201名单
+  @l2_validator_role %{Candidate: 0, Active: 1}
 
   #目前返回环境变量配置的值，后续要从把block_number作为eth_call的参数，从rpc接口中获取治理合约中管理的值
   def l2_epochs_for_locking_undelegation(block_number) do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_epochs_for_locking_undelegation]
+  end
+
+  def l2_epochs_for_locking_exit() do
+    Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_epochs_for_locking_exit]
   end
 
   #目前返回环境变量配置的值，后续要从把block_number作为eth_call的参数，从rpc接口中获取治理合约中管理的值
@@ -233,6 +239,14 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     epoch = calculateL2Epoch(current_block_number, epoch_size)
     epoch * epoch_size + 1
   end
+
+
+  # 计算区块current_block_number所在epoch的后N个epoch的最后一个块高, 确实就是计算当前块高所在epoch的最后一个块高
+  def calculateBlockNumberAfterEpochs(current_block_number, next_epochs \\ default 0) do
+    epoch = calculateL2Epoch(current_block_number, l2_epoch_size())
+    (epoch + next_epochs)* epoch_size
+  end
+
 
 
   # 返回 JSON rpc 请求时的参数
@@ -433,6 +447,9 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     get_block_number_by_tag("latest", json_rpc_named_arguments, 100_000_000)
   end
 
+  def get_latest_block_number() do
+    get_block_number_by_tag("latest", l2_rpc_arguments(), 100_000_000)
+  end
 
   @spec get_block_timestamp_by_number_inner(non_neg_integer(), list()) :: {:ok, Date.t()} | {:error, atom()}
   defp get_block_timestamp_by_number_inner(number, json_rpc_named_arguments) do

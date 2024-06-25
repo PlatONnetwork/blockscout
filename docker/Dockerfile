@@ -36,8 +36,12 @@ ADD apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
 ADD apps/indexer/mix.exs ./apps/indexer/
 
 ENV MIX_HOME=/opt/mix
+#RUN mix hex.config mirror_url https://hexpm.upyun.com
+#RUN HEX_HTTP_TIMEOUT=120 HEX_HTTP_CONCURRENCY=4 MIX_DEBUG=1 mix archive.install github hexpm/hex branch latest
+#RUN HEX_HTTP_TIMEOUT=120 HEX_HTTP_CONCURRENCY=4 MIX_DEBUG=1 mix do deps.get, local.rebar --force, deps.compile
+
 RUN mix local.hex --force
-RUN mix do deps.get, local.rebar --force, deps.compile
+RUN HEX_HTTP_CONCURRENCY=1 HEX_HTTP_TIMEOUT=120 mix do deps.get, local.rebar --force, deps.compile
 
 ADD apps ./apps
 ADD config ./config
@@ -59,7 +63,7 @@ RUN cd apps/block_scout_web/assets/ && \
     apk del --force-broken-world alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3
 
 
-RUN apk add --update git make 
+RUN apk add --update git make
 
 RUN mix phx.digest
 

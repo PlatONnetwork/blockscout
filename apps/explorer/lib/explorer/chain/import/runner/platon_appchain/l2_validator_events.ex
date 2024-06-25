@@ -71,6 +71,11 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     # event_groups是个map，key: true / false value: [2_validator_event]
     registered_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:ValidatorRegistered] end)
 
+    # 状态修改，一般都是从正常 -> 其它状态(退出状态)
+    exit_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:UpdateValidatorStatus] end)
+
+
+    import_result =
     multi
     |> Multi.run(:insert_l2_validator_events, fn repo, _ ->
       Instrumenter.block_import_stage_runner(
@@ -104,6 +109,12 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
         :update_l2_validators
       )
     end)
+
+    # 添加成功通过ws给前端发消息 begin
+    Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator", 1)
+    # 添加成功通过ws给前端发消息 end
+
+    import_result
   end
 
 
@@ -119,25 +130,23 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
         {:error, _reason} -> throw({:error, "add new validator(s) failed"})
       end
     end)
-    # 添加成功通过ws给前端发消息 begin
-    Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator", 1)
-    # 添加成功通过ws给前端发消息 end
-    {:ok, "add new validator(s) successfully"}
   end
 
   defp update_validator(repo, l2_validator_updated_events, %{timeout: timeout, timestamps: timestamps})  do
-    updated_validator_hash_list =
-      l2_validator_updated_events
-      |> Enum.reduce([], fn validator_event, acc ->  [validator_event.validator_hash | acc] end)
-      |> Enum.uniq() # 去重
+#    updated_validator_hash_list =
+#      l2_validator_updated_events
+#      |> Enum.reduce([], fn validator_event, acc ->  [validator_event.validator_hash | acc] end)
+#      |> Enum.uniq() # 去重
 
-    Enum.each(updated_validator_hash_list, fn validator_hash ->
-      case L2ValidatorService.update_validator(repo, Hash.to_string(validator_hash)) do
+    # 因为需要事件中的block_number，所以遍历l2_validator_updated_events，而考虑只过滤出需要修改的validator_hash
+
+    Enum.each(l2_validator_updated_events, fn event ->
+      case L2ValidatorService.update_validator_by_event(repo, event) do
         {:ok, _result} -> :ok
-        {:error, _reason} -> throw({:error, "add new validator(s) failed"})
+        {:error, _reason} -> throw({:error, "update validator(s) failed"})
       end
     end)
-    {:ok, "add new validator(s) successfully"}
+    {:ok, "update validator(s) successfully"}
   end
 
 

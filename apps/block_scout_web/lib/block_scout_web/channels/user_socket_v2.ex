@@ -12,6 +12,7 @@ defmodule BlockScoutWeb.UserSocketV2 do
   channel("transactions:*", BlockScoutWeb.TransactionChannel)
   channel("tokens:*", BlockScoutWeb.TokenChannel)
   channel("zkevm_batches:*", BlockScoutWeb.PolygonZkevmConfirmedBatchChannel)
+
   channel("platon_appchain_l1l2event:*", BlockScoutWeb.L1L2EventChannel)
   channel("platon_appchain_l2_validator:*", BlockScoutWeb.L2ValidatorChannel)
 

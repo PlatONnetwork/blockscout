@@ -38,6 +38,7 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainValidatorView do
       "validators" => validator.validator_hash,
       "status" => validator.status, # 0: 正常 1：无效 2：低出块 4: 低阈值 8: 双签 32：解质押 64:惩罚
       "exit_block" => validator.exit_block,
+      "lock_block" => validator.lock_block,
       "exit_timestamp" => validator.timestamp,
       "event" => validator.exit_desc,
     }

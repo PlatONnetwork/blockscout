@@ -55,13 +55,16 @@ defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL2Validators do
       #	Valided      = 0                         // 0000: The validator was activated
       #	NotExist     = 1 << 31                   // 1000,xxxx,... : The validator is not exist
       # 底层是用bit来存储的，是个复合状态
-      # 浏览器目前只判断：0: 正常 1：无效 2：低出块 4: 低阈值 8: 双签 16：解质押 32:惩罚
+      # 链上验证人状态有：0: 正常 1：无效（只要有后面4种情况，就是无效状态） 2：低出块阈值（出块低于此值将退出） 4: 低阈值（质押数量低于此值将退出） 8: 双签 16：解质押 32:惩罚
       add(:status, :integer, null: false, default: 0)
 
-      # 0-candidate(质押节点) 1-active(共识节点候选人) 2-verifying(共识节点)
+      # 0-candidate(质押节点) 1-active(共识节点候选人) 2-Consensus(共识节点)
+      # 目前没有 2-Consensus(共识节点)记录
       add(:role, :integer, null: false, default: 0)
-      # 退出区块
+      # 退出开始区块
       add(:exit_block, :bigint, null: false)
+      # 锁定结束区块（真正退出完成）
+      add(:lock_block, :bigint, null: false)
       # 退出内容
       add(:exit_desc, :string, null: true)
 

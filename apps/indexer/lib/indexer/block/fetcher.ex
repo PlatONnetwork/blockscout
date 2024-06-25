@@ -180,16 +180,34 @@ defmodule Indexer.Block.Fetcher do
 
          l2_block_produced_statistics =
            if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
-             do: L2SpecialBlockHandler.l2_block_produced_statistics(blocks_params),
+             # do: L2SpecialBlockHandler.l2_block_produced_statistics(blocks_params),
+             do: L2SpecialBlockHandler.inspect(blocks_params),
              else: []
            ),
 
-         #直接upsert表：l2_delegators
+         # 直接upsert表：l2_delegators
+         # 不能只能 Indexer.Block.Realtime.Fetcher。历史区块也要更新。
+         # 比如现在链上块高是1000，在100块时，有用户做了委托，然后一直没有操作。此时启动blockscout开始同步区块，如果只同步realtime的区块，那么1000块前的委托信息将不能同步到。
+#         _ =
+#           if(callback_module == Indexer.Block.Realtime.Fetcher,
+#             do: L2DelegatorService.refreshed_delegators(l2_validator_events, range),
+#             else: []
+#           ),
+
+         # 根据range内的和委托相关的事件，得到哪些delegator信息需要刷新，然后通过调用链的rpc接口，刷新委托信息
          _ =
-           if(callback_module == Indexer.Block.Realtime.Fetcher,
+           if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              do: L2DelegatorService.refreshed_delegators(l2_validator_events, range),
              else: []
            ),
+
+
+        # 检测range中的区块，是否需要更新验证人的角色（共识节点，共识节点候选节点）
+#         _ =
+#          if(callback_module == Indexer.Block.Realtime.Fetcher,
+#            do: L2ValidatorService.reset_validators_role(range),
+#            else: []
+#          ),
 
          optimism_withdrawals =
            if(callback_module == Indexer.Block.Realtime.Fetcher, do: OptimismWithdrawals.parse(logs), else: []),
