@@ -244,7 +244,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
   # 计算区块current_block_number所在epoch的后N个epoch的最后一个块高, 确实就是计算当前块高所在epoch的最后一个块高
   def calculateBlockNumberAfterEpochs(current_block_number, next_epochs \\ 0) do
     epoch = calculateL2Epoch(current_block_number, l2_epoch_size())
-    (epoch + next_epochs)* epoch_size
+    (epoch + next_epochs)* l2_epoch_size()
   end
 
 
