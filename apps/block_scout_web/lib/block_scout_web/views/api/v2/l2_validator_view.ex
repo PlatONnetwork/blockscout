@@ -37,9 +37,9 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorView do
       "auth_status" => validator.auth_status,
       "status" => validator.status,
       "stake_epoch" => validator.stake_epoch,
-      "exit_block" => validator_detail.exit_block,
-      "exit_desc" => validator_detail.exit_desc,
-      "lock_block" => validator_detail.lock_block
+      "exit_block" => validator.exit_block,
+      "exit_desc" => validator.exit_desc,
+      "lock_block" => validator.lock_block
     }
   end
 
@@ -56,7 +56,7 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorView do
              "status" => his_validator.status,
              "exit_block" => his_validator.exit_block,
              "event" => his_validator.exit_desc,
-             "lock_block" => validator_detail.lock_block
+             "lock_block" => his_validator.lock_block
            }
         end),
       next_page_params: next_page_params
