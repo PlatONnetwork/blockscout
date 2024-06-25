@@ -14,7 +14,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
 
   alias Explorer.Chain.{Address, Block, Hash, Wei}
 
-  @optional_attrs ~w(locking_stake_amount withdrawal_stake_amount withdrawn_reward stake_reward delegate_reward rank name detail logo website expect_apr block_rate auth_status role exit_block exit_desc)a
+  @optional_attrs ~w(locking_stake_amount withdrawal_stake_amount withdrawn_reward stake_reward delegate_reward rank name detail logo website expect_apr block_rate auth_status role exit_block lock_block exit_desc)a
 
   @required_attrs ~w(validator_hash owner_hash stake_amount delegate_amount commission_rate stake_epoch status)a
 
@@ -44,7 +44,8 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
      auth_status:  是否验证 0-未验证，1-已验证,
      role:  0-candidate(质押节点) 1-active(共识节点候选人) 2-verifying(共识节点),
      status:  浏览器目前只判断：0: 正常 1：无效 2：低出块 4: 低阈值 8: 双签 16：解质押 32:惩罚,
-     exit_block: 退出区块,
+     exit_block: 退出开始区块,
+     exit_block: 锁定结束区块（真正退出完成）
      exit_desc: 退出内容
   """
   @type t :: %__MODULE__{
@@ -72,6 +73,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
                role:  non_neg_integer(),
                status:  non_neg_integer(),
                exit_block: non_neg_integer(),
+               lock_block: non_neg_integer(),
                exit_desc: String.t()
              }
 
@@ -101,6 +103,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
     field(:role, :integer)
     field(:status, :integer)
     field(:exit_block, :integer)
+    field(:lock_block, :integer)
     field(:exit_desc, :string)
 
     timestamps()
@@ -170,6 +173,44 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
   def update_status(validator_hash, newStatus) do
     from(v in __MODULE__, where: v.validator_hash == ^validator_hash, update: [set: [status: ^newStatus]])
     |> Repo.update_all([])
+  end
+
+  # 重置验证人中的出块节点（role = 2)
+  #  def reset_verifying_validators(validator_hash_list) do
+  #    Ecto.Multi.new()
+  #    |> do_reset_verifying_validators(validator_hash_list)
+  #    |> Repo.transaction()
+  #  end
+  #  defp do_reset_verifying_validators(multi, validator_hash_list) do
+  #    Ecto.Multi.update_all(multi, {:reset_verifying_validator, validator_hash}, from(v in __MODULE__, where: v.role == 2), [role: 1])
+  #    Enum.reduce(validator_hash_list, multi, fn validator_hash, multi ->
+  #      Ecto.Multi.update_all(multi, {:reset_verifying_validator, validator_hash}, from(v in __MODULE__, where: v.validator_hash == ^validator_hash), [role: 2])
+  #    end)
+  #  end
+
+  # 验证人角色 0-candidate(质押节点) 1-active(共识节点候选人，201名单) 2-Consensus(共识节点，43名单)
+  # 目前没有 2-Consensus(共识节点)记录
+  # 结算周期开始（肯定也是某个共识周期开始），重置201名单
+  # 把原记录role=1 的记录更新为role=0；根据新的201名单，更新记录
+  #  def reset_role_at_epoch_begin(active_validator_hash_list, consensus_validator_hash_list) do
+  #    Ecto.Multi.new()
+  #    |> reset_role_at_epoch_begin(active_validator_hash_list, consensus_validator_hash_list)
+  #    |> Repo.transaction()
+  #  end
+  def reset_active_validators(active_validator_hash_list) do
+    Ecto.Multi.new()
+    |> reset_active_validators(active_validator_hash_list)
+    |> Repo.transaction()
+  end
+
+  defp reset_active_validators(multi, active_validator_hash_list) do
+    # 把原记录role=1的记录更新为role=0
+    Ecto.Multi.update_all(multi, :reset_active_validator, from(v in __MODULE__, where: v.role == 1), [role: 0])
+
+    # 根据新的201名单，更新记录
+    Enum.reduce(active_validator_hash_list, multi, fn validator_hash, multi ->
+      Ecto.Multi.update_all(multi, :reset_active_validator, from(v in __MODULE__, where: v.validator_hash == ^validator_hash), [role: 1])
+    end)
   end
 
   def update_rank_and_amount(rank_tuple_list) do
@@ -267,11 +308,12 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
 #        conflict_target: [:validator_hash])
 #  end
 
-  def delete_exited_validator(repo, validator_hash) do
-    repo.delete_all(
-      from(x in __MODULE__, where: x.validator_hash == ^validator_hash))
-  end
+#  def delete_exited_validator(repo, validator_hash) do
+#    repo.delete_all(
+#      from(x in __MODULE__, where: x.validator_hash == ^validator_hash))
+#  end
 
+  # 只查询正常的验证人
   @spec list_validators_by_role([]) :: [__MODULE__.t]
   def list_validators_by_role(options \\ []) do
     q  = Keyword.get(options, :q, "")
@@ -281,18 +323,19 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
         "all" ->
           from(
             v in __MODULE__,
+            where: v.status == 0,
             order_by: [desc: v.rank]
           )
         "active" ->
           from(
             v in __MODULE__,
-            where: v.role == 1,
+            where: v.status == 0 and v.role == 1,
             order_by: [desc: v.rank]
           )
         "candidate" ->
           from(
             v in __MODULE__,
-            where: v.role == 0,
+            where: v.status == 0 and v.role == 0,
             order_by: [desc: v.rank]
           )
       end
@@ -313,6 +356,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
     |> select_repo(options).all()
   end
 
+  # 只查询正常的验证人
   @spec find_by_validator_hash(Hash.Address.t()) :: {:ok, L2Validator.t()} | {:error, :not_found}
   def find_by_validator_hash(%Hash{byte_count: unquote(Hash.Address.byte_count())} = validator_hash, options \\ []) do
     L2Validator
@@ -327,9 +371,11 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
   end
 
   #  首页统计
+  # 只统计正常的验证人
   def statistics_validators() do
     query =
       from(l in __MODULE__,
+        where: l.status == 0,
         select: %{
           validator_count: coalesce(count(1), 0),
           total_staked: coalesce(sum(l.stake_amount + l.locking_stake_amount),0)
@@ -341,9 +387,11 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
   end
 
   #  验证人首页统计(总验证人数)
+  # 只统计正常的验证人
   def validators_size() do
     query =
       from(l in __MODULE__,
+        where: l.status == 0,
         select: %{
           validator_count: coalesce(count(1), 0)
         }
@@ -353,9 +401,11 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
     |> select_repo([]).one()
   end
 
+  # 只统计正常的验证人
   def get_total_bonded() do
     query =
       from(l in __MODULE__,
+        where: l.status == 0,
         select: coalesce(sum(l.stake_amount + l.delegate_amount),0)
       )
 
@@ -364,7 +414,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
   end
 
 
-  # 根据owner_hash查询validator数量
+  # 根据owner_hash查询validator数量（正常的）
   def count_by_owner_hash(owner_hash) do
     query =
       from(l in __MODULE__,
@@ -375,7 +425,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
     Repo.one(query)
   end
 
-  # 根据validator_hash查询validator数量
+  # 根据validator_hash查询validator数量（正常的）
   def count_by_validator_hash(validator_hash) do
     query =
       from(l in __MODULE__,
@@ -386,7 +436,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
     Repo.one(query)
   end
 
-  # 根据validator_hash查询validator数量
+  # 根据validator_hash查询validator数量（正常的）
   def get_validator_total_assets_staked(validator_hash) do
     query =
       from(l in __MODULE__,
@@ -412,9 +462,11 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
           validator_hash: v.validator_hash,
           status: v.status,
           exit_block: v.exit_block,
+          lock_block: v.lock_block,
           exit_desc: v.exit_desc,
           timestamp: block.timestamp}
       )
+
 
     base_query
     |> page_history_validators(paging_options)
@@ -423,13 +475,13 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
   end
 
   defp page_history_validators(query, %PagingOptions{key: nil}) do
-    from(item in query, where: item.status > 8)
+    from(item in query, where: item.status > 0)
   end
 
   defp page_history_validators(query, %PagingOptions{key: {validator_hash}}) do
     from(item in query,
       where:
-        item.validator_hash > ^validator_hash and item.status> 8
+        item.validator_hash > ^validator_hash and item.status > 0
     )
   end
 end
