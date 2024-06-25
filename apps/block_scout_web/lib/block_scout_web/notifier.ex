@@ -430,6 +430,10 @@ defmodule BlockScoutWeb.Notifier do
   end
 
   defp broadcast_block(block) do
+    Logger.info(fn -> "broadcast_block 1111111111111111111111111111111111111111111 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" end ,
+      logger: :platon_appchain
+    )
+    Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "allvalidator",1)
     preloaded_block = Repo.preload(block, [[miner: :names], :transactions, :rewards])
     average_block_time = AverageBlockTime.average_block_time()
 

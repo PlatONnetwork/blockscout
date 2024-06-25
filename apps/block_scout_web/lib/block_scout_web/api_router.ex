@@ -271,6 +271,7 @@ defmodule BlockScoutWeb.ApiRouter do
       get("/blocks-produced", V2.L2ValidatorController, :blocks_produced) # 出块记录
       get("/validator-action", V2.L2ValidatorController, :validator_action) # 验证人操作事件
       get("/delegator", V2.L2ValidatorController, :delegator) # 委托记录(取数据逻辑待讨论)
+      get("/ws", V2.L2ValidatorController, :ws) # 模拟后台给前端推送消息
       put("/verification/", V2.L2ValidatorController, :update_verification) #提交验证人信息
       get("/:validator_hash_param", V2.L2ValidatorController, :validator_details) # 获取验证人详情
     end
