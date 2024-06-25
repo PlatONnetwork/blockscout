@@ -857,6 +857,7 @@ config :indexer, Indexer.Fetcher.PlatonAppchain,
        l2_round_size: ConfigHelper.parse_integer_env_var("INDEXER_PLATON_APPCHAIN_L2_ROUND_SIZE", 250),
        l2_round_size_per_validator: ConfigHelper.parse_integer_env_var("INDEXER_PLATON_APPCHAIN_L2_ROUND_SIZE_PER_VALIDATOR", 10),
        l2_block_reward: ConfigHelper.parse_integer_env_var("INDEXER_PLATON_APPCHAIN_L2_BLOCK_REWARD", 4000000000000000000),
+       l2_epoch_stake_reward: ConfigHelper.parse_integer_env_var("INDEXER_PLATON_APPCHAIN_L2_EPOCH_STAKE_REWARD", 50000000000000000000000),
        l2_epochs_for_locking_undelegation: ConfigHelper.parse_integer_env_var("INDEXER_PLATON_APPCHAIN_L2_EPOCHS_FOR_LOCKING_UNDELEGATION", 6),
        l2_epochs_for_locking_exit: ConfigHelper.parse_integer_env_var("INDEXER_PLATON_APPCHAIN_L2_EPOCHS_FOR_LOCKING_EXIT", 6)
 
