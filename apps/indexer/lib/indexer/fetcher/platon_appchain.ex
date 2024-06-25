@@ -87,11 +87,6 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_block_reward]
   end
 
-  #目前返回环境变量配置的值，后续要从把block_number作为eth_call的参数，从rpc接口中获取治理合约中管理的值
-  def l2_epoch_stake_reward() do
-    Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_epoch_stake_reward]
-  end
-
   # 每个共识周期区块数
   def l2_round_size() do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_round_size]
@@ -1001,7 +996,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
 
   @spec fill_block_range_no_event_id(integer(), integer(), {module(), module()}, binary(), list()) :: integer()
   def fill_block_range_no_event_id(start_block, end_block, {module, table}, contract_address, json_rpc_named_arguments) do
-    # 首先尝试从logs种获取数据
+    # 首先尝试从logs.种获取数据
     fill_block_range(start_block, end_block, module, contract_address, json_rpc_named_arguments, true)
 
     {last_l2_block_number, _} = get_last_l2_item(table)
