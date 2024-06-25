@@ -80,6 +80,9 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
           name: v.name,
           status: v.status,
           role: v.role,
+          exit_block: v.exit_block,
+          exit_desc: v.exit_desc,
+          lock_block: v.lock_block,
           locking_stake_amount: v.locking_stake_amount,
           withdrawal_stake_amount: v.withdrawal_stake_amount
         },
