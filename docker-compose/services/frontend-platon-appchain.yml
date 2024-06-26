@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  frontend:
+    image: hudenian/blockscout-frontend-platon-appchain:latest
+    pull_policy: always
+    platform: linux/amd64
+    restart: always
+    container_name: 'frontend'
+    env_file:
+      -  ../envs/common-frontend-platon-appchain.env
+    ports:
+      - target: 3000
+        published: 3000
