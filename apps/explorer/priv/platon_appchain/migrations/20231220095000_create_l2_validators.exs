@@ -62,9 +62,9 @@ defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL2Validators do
       # 目前没有 2-Consensus(共识节点)记录
       add(:role, :integer, null: false, default: 0)
       # 退出开始区块
-      add(:exit_block, :bigint, null: false)
+      add(:exit_block, :bigint, null: false, default: 0)
       # 锁定结束区块（真正退出完成）
-      add(:lock_block, :bigint, null: false)
+      add(:lock_block, :bigint, null: false, default: 0)
       # 退出内容
       add(:exit_desc, :string, null: true)
 

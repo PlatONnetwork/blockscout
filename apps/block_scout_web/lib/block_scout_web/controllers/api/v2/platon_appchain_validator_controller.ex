@@ -9,7 +9,7 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainValidatorController do
          ]
 
   require Logger
-
+  alias Indexer.Fetcher.PlatonAppchain
   alias Explorer.Chain.PlatonAppchain.{L2Validator, DailyStatic}
   alias Explorer.Chain.{Wei}
 
@@ -33,8 +33,8 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainValidatorController do
          "total_bonded" => total_bonded,
          "total_bonded_24_hours" => Decimal.sub(total_bonded, Decimal.new(daily_static.total_bonded.value)),
          "reward_pool" => reward_pool,
-         "block_reward" => "待提供数据",
-         "epoch_staking_reward" => "待提供数据"
+         "block_reward" => PlatonAppchain.l2_block_reward(),
+         "epoch_staking_reward" => PlatonAppchain.l2_epoch_stake_reward()
        }
      )
    else
@@ -46,8 +46,8 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainValidatorController do
          "total_bonded" => total_bonded,
          "total_bonded_24_hours" => total_bonded,
          "reward_pool" => reward_pool,
-         "block_reward" => "待提供数据",
-         "epoch_staking_reward" => "待提供数据"
+         "block_reward" => PlatonAppchain.l2_block_reward(),
+         "epoch_staking_reward" => PlatonAppchain.l2_epoch_stake_reward()
        }
      )
    end

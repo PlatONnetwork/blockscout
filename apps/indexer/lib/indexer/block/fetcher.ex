@@ -181,7 +181,7 @@ defmodule Indexer.Block.Fetcher do
          l2_block_produced_statistics =
            if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              # do: L2SpecialBlockHandler.l2_block_produced_statistics(blocks_params),
-             do: L2SpecialBlockHandler.inspect(blocks_params),
+             do: L2SpecialBlockHandler.inspect_special_block(blocks_params),
              else: []
            ),
 

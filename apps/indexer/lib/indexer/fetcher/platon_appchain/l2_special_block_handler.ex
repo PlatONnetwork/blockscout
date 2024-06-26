@@ -20,18 +20,17 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
   #		actual_blocks: item.actual_blocks,
   #	}
   #]
-  def inspect(blocks) when is_list(blocks) do
+  def inspect_special_block(blocks) when is_list(blocks) do
     round_end_blocks = Enum.filter(blocks, fn block -> PlatonAppchain.is_round_end_block(block.number) == true end)
 
-    l2_block_produced_statistic_list =
-      round_end_blocks
-      |> Enum.reduce(round_end_blocks, [], fn block,acc ->
+    # 不需要 判断 round_end_blocks == []
+    l2_block_produced_statistic_list = Enum.reduce(round_end_blocks, [], fn block,acc ->
         acc ++ get_l2_block_produced_statistic(block)
       end)
 
     epoch_begin_blocks = Enum.filter(blocks, fn block -> PlatonAppchain.is_epoch_begin_block(block.number) == true end)
 
-    if epoch_begin_blocks != nil do
+    if Enum.empty?(epoch_begin_blocks) == false do
       max_epoch_begin_block = Enum.take(epoch_begin_blocks, -1)
 
       L2ValidatorService.reset_active_validators(max_epoch_begin_block)

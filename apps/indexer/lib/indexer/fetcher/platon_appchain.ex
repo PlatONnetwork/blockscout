@@ -87,6 +87,12 @@ defmodule Indexer.Fetcher.PlatonAppchain do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_block_reward]
   end
 
+  #目前返回环境变量配置的值，后续要从把block_number作为eth_call的参数，从rpc接口中获取治理合约中管理的值
+  def l2_epoch_stake_reward() do
+    Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_epoch_stake_reward]
+  end
+
+
   # 每个共识周期区块数
   def l2_round_size() do
     Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:l2_round_size]
@@ -243,8 +249,9 @@ defmodule Indexer.Fetcher.PlatonAppchain do
 
   # 计算区块current_block_number所在epoch的后N个epoch的最后一个块高, 确实就是计算当前块高所在epoch的最后一个块高
   def calculateBlockNumberAfterEpochs(current_block_number, next_epochs \\ 0) do
-    epoch = calculateL2Epoch(current_block_number, l2_epoch_size())
-    (epoch + next_epochs)* l2_epoch_size()
+    epoch_size =l2_epoch_size()
+    epoch = calculateL2Epoch(current_block_number, epoch_size)
+    (epoch + next_epochs)* epoch_size
   end
 
 

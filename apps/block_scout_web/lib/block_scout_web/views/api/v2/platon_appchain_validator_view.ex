@@ -27,8 +27,9 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainValidatorView do
       "auth_status" => validator.auth_status, #  是否验证 0-未验证，1-已验证
       "role" => validator.role, # 0-candidate(质押节点) 1-active(共识节点候选人) 2-verifying(共识节点)
       "block_rate" => validator.block_rate,
-      "total_bonded_amount" => "总质押金额",
-      "total_bonded_percent" => "总质押占所有质押比",
+      "exit_block" => validator.exit_block,
+      "exit_desc" => validator.exit_desc,
+      "lock_block" => validator.lock_block
     }
   end
 
@@ -38,6 +39,7 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainValidatorView do
       "validators" => validator.validator_hash,
       "status" => validator.status, # 0: 正常 1：无效 2：低出块 4: 低阈值 8: 双签 32：解质押 64:惩罚
       "exit_block" => validator.exit_block,
+      # "exit_desc" => validator.exit_desc,
       "lock_block" => validator.lock_block,
       "exit_timestamp" => validator.timestamp,
       "event" => validator.exit_desc,
