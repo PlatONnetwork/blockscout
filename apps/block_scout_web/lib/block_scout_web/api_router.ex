@@ -267,7 +267,7 @@ defmodule BlockScoutWeb.ApiRouter do
       get("/active", V2.PlatonAppchainValidatorController, :list_active_validators) # 获取所有候选共识节点
       get("/candidate", V2.PlatonAppchainValidatorController, :list_candidate_validators) # 获取所有质押节点
       get("/history", V2.PlatonAppchainValidatorController, :list_history_validators) # 分页获取历史验证人列表
-      get("/staking", V2.L2ValidatorController, :staking) # 验证人质押
+      get("/staking", V2.L2ValidatorController, :staking) # 验证人质押相关操作列表
       get("/blocks-produced", V2.L2ValidatorController, :blocks_produced) # 出块记录
       get("/validator-action", V2.L2ValidatorController, :validator_action) # 验证人操作事件
       get("/delegator", V2.L2ValidatorController, :delegator) # 委托记录(取数据逻辑待讨论)

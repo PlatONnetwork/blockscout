@@ -28,13 +28,13 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainValidatorController do
      json(
        conn,
        %{
-         "validators" => validator_count,
-         "validators_24_hours" => validator_count - daily_static.total_validator_size,
-         "total_bonded" => total_bonded,
-         "total_bonded_24_hours" => Decimal.sub(total_bonded, Decimal.new(daily_static.total_bonded.value)),
-         "reward_pool" => reward_pool,
-         "block_reward" => PlatonAppchain.l2_block_reward(),
-         "epoch_staking_reward" => PlatonAppchain.l2_epoch_stake_reward()
+         "validators" => validator_count, # 质押节点总数
+         "validators_24_hours" => validator_count - daily_static.total_validator_size,  # 质押节点今日增长数量
+         "total_bonded" => total_bonded, # 总质押金额
+         "total_bonded_24_hours" => Decimal.sub(total_bonded, Decimal.new(daily_static.total_bonded.value)), # 质押金额今日增长数量
+         "reward_pool" => reward_pool,  # 总质押奖励
+         "block_reward" => PlatonAppchain.l2_block_reward(),  # 出块奖励
+         "epoch_staking_reward" => PlatonAppchain.l2_epoch_stake_reward()  # 每个共识周期的质押奖励
        }
      )
    else
