@@ -81,6 +81,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   def getValidators(start \\ <<>>, size \\ @default_size) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidators
     result = get_validators(start, size) |> Ethers.call(rpc_opts: @rpc_opts)
+    Logger.debug(fn -> "convert Ethers.call.getValidators log.data: result: #{result}" end,logger: :platon_appchain)
+
     {:ok, data} = result
     # Logger.debug(fn -> "getValidators: #{inspect(data)}" end , logger: :platon_appchain)
     [nextStart | validators] = data
