@@ -14,7 +14,7 @@ defmodule ConfigHelper do
         :ethereum -> base_repos ++ [Explorer.Repo.Beacon]
         :optimism -> base_repos ++ [Explorer.Repo.Optimism]
         :polygon_edge -> base_repos ++ [Explorer.Repo.PolygonEdge]
-        platon_appchain -> base_repos ++ [Explorer.Repo.PlatonAppchain]
+        :platon_appchain -> base_repos ++ [Explorer.Repo.PlatonAppchain]
         :polygon_zkevm -> base_repos ++ [Explorer.Repo.PolygonZkevm]
         :rsk -> base_repos ++ [Explorer.Repo.RSK]
         :shibarium -> base_repos ++ [Explorer.Repo.Shibarium]
