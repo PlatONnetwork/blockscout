@@ -1,8 +1,16 @@
 defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L1StakeManager do
   alias Ethers
-  use Ethers.Contract, abi_file: "config/abi/L1_StakeManager.json", default_address: Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain.Contracts][:l1_stake_manager]
 
-  @rpc_opts [url: Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:platon_appchain_l1_rpc], http_headers: [{"Content-Type", "application/json"}]]
+  #use Ethers.Contract, abi_file: "config/abi/L1_StakeManager.json", default_address: Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain.Contracts][:l1_stake_manager]
+  use Ethers.Contract, abi_file: "config/abi/L1_StakeManager.json"
+  defp l1StakeManagerContract() do
+    Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain.Contracts][:l1_stake_manager]
+  end
+
+  # @rpc_opts [url: Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:platon_appchain_l1_rpc], http_headers: [{"Content-Type", "application/json"}]]
+  defp rpc_opts() do
+    [url: Application.get_all_env(:indexer)[Indexer.Fetcher.PlatonAppchain][:platon_appchain_l1_rpc], http_headers: [{"Content-Type", "application/json"}]]
+  end
 
   @doc """
   Query the total amount stake for all child chains
@@ -11,7 +19,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L1StakeManager do
     * Total amount stake for all child chains
   """
   def totalStake() do
-    result = total_stake() |> Ethers.call(rpc_opts: @rpc_opts)
+    result = total_stake() |> Ethers.call(to: l1StakeManagerContract(),rpc_opts: rpc_opts())
     {:ok, data} = result
     data
   end
@@ -23,7 +31,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L1StakeManager do
     * Total amount delegation for all child chains
   """
   def totalDelegation() do
-    result = total_delegation() |> Ethers.call(rpc_opts: @rpc_opts)
+    result = total_delegation() |> Ethers.call(to: l1StakeManagerContract(), rpc_opts: rpc_opts())
     {:ok, amount} = result
     amount
   end
@@ -35,7 +43,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L1StakeManager do
     * The min amount to delegate a validator
   """
   def minDelegate() do
-    result = min_delegate() |> Ethers.call(rpc_opts: @rpc_opts)
+    result = min_delegate() |> Ethers.call(to: l1StakeManagerContract(), rpc_opts: rpc_opts())
     {:ok, amount} = result
     amount
   end
@@ -47,7 +55,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L1StakeManager do
     * The min amount to stake a validator
   """
   def minStake() do
-    result = min_stake() |> Ethers.call(rpc_opts: @rpc_opts)
+    result = min_stake() |> Ethers.call(to: l1StakeManagerContract(), rpc_opts: rpc_opts())
     {:ok, amount} = result
     amount
   end
@@ -62,7 +70,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L1StakeManager do
     * Amount of stake a validator can withdraw
   """
   def withdrawableStake(validator) do
-    result = withdrawable_stake(validator) |> Ethers.call(rpc_opts: @rpc_opts)
+    result = withdrawable_stake(validator) |> Ethers.call(to: l1StakeManagerContract(), rpc_opts: rpc_opts())
     {:ok, amount} = result
     amount
   end
@@ -77,7 +85,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L1StakeManager do
     * Amount of delegate a validator can withdraw
   """
   def withdrawableDelegation(validator) do
-    result = withdrawable_delegation(validator) |> Ethers.call(rpc_opts: @rpc_opts)
+    result = withdrawable_delegation(validator) |> Ethers.call(to: l1StakeManagerContract(), rpc_opts: rpc_opts())
     {:ok, amount} = result
     amount
   end
