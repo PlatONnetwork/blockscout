@@ -10,6 +10,7 @@ defmodule Indexer.Transform.PlatonAppchain.L2ValidatorEvents do
 
   @doc """
   Returns a list of l2 executes given a list of logs.
+  apps/indexer/lib/indexer/block/fetcher.ex中fetch_and_import_range()中调用，得到事件并import到db
   """
   @spec parse(list(), list()) :: list()
   def parse(logs, json_rpc_named_arguments) do
@@ -31,7 +32,8 @@ defmodule Indexer.Transform.PlatonAppchain.L2ValidatorEvents do
         end)
         |> Enum.reduce([], fn log, acc ->
           Logger.info("L2 (Stake Event) message found, validator: #{log.second_topic}.")
-
+          # todo:
+          # l2_events.ex等几个文件中，为什么没有用Enum.reduce递归，而是直接用了一个Enum.map？
           acc ++ L2ValidatorEvent.event_to_l2_validator_events(
             log.index,
             log.first_topic,

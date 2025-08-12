@@ -159,8 +159,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
     Repo.delete_all(from(w in L2ValidatorEvent, where: w.block_number >= ^starting_block))
   end
 
-  # 返回一个map的list(处理slash需要返回一个list)
-  # 返回一个map
+  # 返回一个map的list(处理slash需要返回一个list)，每个map都是一个和l2_validators表结构相关的数据
+  # 调用链： apps/indexer/lib/indexer/block/fetcher.ex#fetch_and_import_range() - > apps/indexer/lib/indexer/transform/platon_appchain/l2_validator_events.ex:15 # parse() -> 这个方法，最后有block/fetcher.ex import到db（upsert）
   @spec event_to_l2_validator_events(non_neg_integer(), binary(), binary(), binary(), binary(), binary(), non_neg_integer(), list()) :: [map()]
   def event_to_l2_validator_events(log_index, first_topic, second_topic, third_topic, data, l2_transaction_hash, l2_block_number, json_rpc_named_arguments) do
 
@@ -189,6 +189,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
           # second_topic，需要记录到topic的数据，如果长度>32字节，则取数据的hash，并把hash放入topic，如果数据长度<=32字节，则左补零后放入topic
           validator_hash = Base.decode16!(String.slice(second_topic, -40..-1), case: :mixed)
 
+          #todo: 这个导入l2_validators记录的逻辑移动到哪里了？
           #L2ValidatorService.add_new_validator(validator_hash)
           [%{
             log_index: log_index,
@@ -228,7 +229,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
           delegator_hash =  Base.decode16!(String.slice(second_topic, -40..-1), case: :mixed)
           validator_hash =  Base.decode16!(String.slice(third_topic, -40..-1), case: :mixed)
           #与l2_validator_events导入放在同一个事务中
-#          L2ValidatorService.increase_delegation(validator_hash, amount)
+#``         `` L2ValidatorService.increase_delegation(validator_hash, amount)
           [%{
             log_index: log_index,
             validator_hash: validator_hash,
@@ -455,8 +456,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
           end)
       end
 
-    # 过滤掉返回为空的events
-    filtered_events = Enum.reject(l2_validator_events, &Enum.empty?/1)
+    # 过滤掉返回为空的events，并导入l2+validator_events表。
+    # todo: 这个Chain.import（）会调用到哪里？这个 l2_validator_events里的对象是个list，每个item是event_to_l2_validator_events返回的对象
+
+      filtered_events = Enum.reject(l2_validator_events, &Enum.empty?/1)
     if Enum.count(filtered_events)> 0 do
       {:ok, _} =
         Chain.import(%{

@@ -12,6 +12,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
   @spec upsert_validator(Repo.t(), binary()) :: {:ok, integer()} | {:error, reason :: String.t()}
   def upsert_validator(repo, validator_hex) do
+    # 去合约查询验证人信息，并upsert到l2_validators表
     validatorMap = L2StakeHandler.getValidator(validator_hex)
     L2Validator.upsert_validator(repo, validatorMap)
   end

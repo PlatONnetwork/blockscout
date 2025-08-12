@@ -157,6 +157,7 @@ defmodule Indexer.Block.Fetcher do
          %{transaction_actions: transaction_actions} = TransactionActions.parse(logs),
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
 
+         # 获取 platon_appchain的事件
          l2_events =
            if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
              do: L2Events.parse(logs),

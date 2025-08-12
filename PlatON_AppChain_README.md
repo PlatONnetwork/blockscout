@@ -105,4 +105,9 @@ export EXCHANGE_RATES_PROXY="http://127.0.0.1:7890"
 
 # Disables or enables fetching of coin price from Coingecko API.
 export DISABLE_EXCHANGE_RATES=false
+
+# 这个合约是在L1上部署，给L2流通使用的。比如在L1上质押，委托就是这个合约发行的token
+export INDEXER_PLATON_APPCHAIN_L1_TOKEN_CONTRACT
 ```
+
+

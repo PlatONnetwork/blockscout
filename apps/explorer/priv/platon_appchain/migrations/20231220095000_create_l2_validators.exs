@@ -69,17 +69,6 @@ defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL2Validators do
       add(:exit_desc, :string, null: true)
 
       timestamps(null: false, type: :utc_datetime_usec)
-
-      # 初始化数据
-      execute("""
-        insert into l2_validators
-          (validator_hash, owner_hash, stake_epoch, commission_rate, stake_amount, locking_stake_amount, withdrawal_stake_amount, delegate_amount, stake_reward, delegate_reward, rank, auth_status, status,role, exit_block, inserted_at, updated_at)
-        values
-          ('\x1dD26DfB60B996FD5D5152aF723949971D9119eE', '\x62953f9213f899f2A51680C2fBB4282a2591bfc8', 0, 0, 1000000000, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, now(), now()),
-          ('\x70d207C1322CCB9069D3790D6768866DaBFf1035', '\x62953f9213f899f2A51680C2fBB4282a2591bfc8', 0, 0, 1000000000, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, now(), now()),
-          ('\x343972bF63D1062761aaaA891D2750f03cB4b2f7', '\x62953f9213f899f2A51680C2fBB4282a2591bfc8', 0, 0, 1000000000, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, now(), now()),
-          ('\x97AB3d4f7F5051F127b0e9f8d10772125D94D65b', '\x62953f9213f899f2A51680C2fBB4282a2591bfc8', 0, 0, 1000000000, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, now(), now());
-      """)
     end
   end
 end
