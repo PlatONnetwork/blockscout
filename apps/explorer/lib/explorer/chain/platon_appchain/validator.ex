@@ -204,7 +204,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
     )
   end
 
-  defp page_validator_event_blocks(query, %PagingOptions{key: nil}), do: query
+  defp page_validator_events_blocks(query, %PagingOptions{key: nil}), do: query
 
   defp page_validator_events_blocks(query, %PagingOptions{key: {validator_hash}}) do
     from([_, v, _] in query, where: v.validator_hash == ^validator_hash)
