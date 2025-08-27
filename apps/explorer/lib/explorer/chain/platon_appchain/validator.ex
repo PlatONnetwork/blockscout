@@ -121,8 +121,8 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
     base_query =
       from(
         b in Block,
-        lef_join: v in L2Validator,
-        on: b.miner_hash = v.owner_hash,
+        left_join: v in L2Validator,
+        on: b.miner_hash == v.owner_hash,
         left_join: t in Transaction,
         on: b.number == t.block_number,
         # 如果group_by的分组条件不是主键，则要把select中的非聚合字段，都写到group_by中
