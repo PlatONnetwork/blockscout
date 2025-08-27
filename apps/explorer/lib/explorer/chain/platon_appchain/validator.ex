@@ -121,14 +121,17 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
     base_query =
       from(
         b in Block,
+        lef_join: v in L2Validator,
+        on: b.miner_hash = v.owner_hash,
         left_join: t in Transaction,
         on: b.number == t.block_number,
         # 如果group_by的分组条件不是主键，则要把select中的非聚合字段，都写到group_by中
-        group_by: [b.number, b.timestamp, b.gas_used, b.gas_limit, b.block_reward],
+        group_by: [b.number, v.validator_hash, b.timestamp, b.gas_used, b.gas_limit, b.block_reward],
         select: %{
           number: b.number,
+          validator_hash: v.validator_hash,
           block_timestamp: b.timestamp,
-          #区块包含的记录数
+          #区块包含的记录数ch
           #txn: b.size,
           txn: count(t.hash),
           gas_used: b.gas_used,
@@ -205,13 +208,13 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
   defp page_validator_event_blocks(query, %PagingOptions{key: nil}), do: query
 
   defp page_validator_events_blocks(query, %PagingOptions{key: {validator_hash}}) do
-    from(item in query, where: item.miner_hash == ^validator_hash)
+    from(item in query, where: item.validator_hash == ^validator_hash)
   end
 
   defp page_validator_events_blocks(query, %PagingOptions{key: {validator_hash,block_number}}) do
     from(item in query,
       where:
-        item.miner_hash == ^validator_hash and item.number < ^block_number
+        item.validator_hash == ^validator_hash and item.number < ^block_number
     )
   end
 end
