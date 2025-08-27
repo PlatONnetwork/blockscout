@@ -211,9 +211,9 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
   end
 
   defp page_validator_events_blocks(query, %PagingOptions{key: {validator_hash,block_number}}) do
-    from([_, v, _] in query,
+    from([b, v, _] in query,
       where:
-        v.validator_hash == ^validator_hash and item.number < ^block_number
+        v.validator_hash == ^validator_hash and b.number < ^block_number
     )
   end
 end
