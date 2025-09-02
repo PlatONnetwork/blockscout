@@ -76,7 +76,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
       )
     query
     |> Repo.one()
-    |> Kernel.||({0, nil})
+    |> Kernel.||({nil})
   end
 
   @spec get_checkpoint_hash_by_block_number(non_neg_integer()) :: {binary() | nil}
@@ -89,24 +89,25 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
       )
     query
     |> Repo.one()
-    |> Kernel.||({0, nil})
+    |> Kernel.||({nil})
   end
 
   @spec prepare_events(list(), list()) :: list()
   def prepare_events(events, _json_rpc_named_arguments) do
     Enum.map(events, fn event ->
       event_id = quantity_to_integer(Enum.at(event["topics"], 1)) #l2上收集状态变更事件组成checkpoint的截至块高（L2上生成checkpoint的块高的前3个块高）。事实上，checkpoint收集的装备变更事件，是跨epoch的。
-      status = Enum.at(event["topics"], 2)
+      replay_status = quantity_to_integer(Enum.at(event["topics"], 2)) #quantity_to_integer 16进制字符串转成integer
+
 
       # 查询event_id所属的交易事件在l2的区块号
-      { l2_blockNumber } = get_l2_block_number_by_event_id(event_id)
+      { l2_blockNumber} = get_l2_block_number_by_event_id(event_id)
       # 根据区块号去查寻对应的checkpoint交易的交易hash
-      { checkpoint_hash } = get_checkpoint_hash_by_block_number(l2_blockNumber)
+      { checkpoint_hash} = get_checkpoint_hash_by_block_number(l2_blockNumber)
       %{
         event_id: event_id,
         hash: event["transactionHash"],
         checkpoint_hash: checkpoint_hash,
-        replay_status: Kernel.boolean(status),
+        replay_status: replay_status,
         status: 1
       }
     end)
