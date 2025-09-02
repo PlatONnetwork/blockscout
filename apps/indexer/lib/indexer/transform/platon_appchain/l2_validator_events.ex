@@ -14,6 +14,7 @@ defmodule Indexer.Transform.PlatonAppchain.L2ValidatorEvents do
   """
   @spec parse(list(), list()) :: list()
   def parse(logs, json_rpc_named_arguments) do
+    Logger.debug("to parse L2ValidatorEvents")
     prev_metadata = Logger.metadata()
     Logger.metadata(fetcher: :platon_appchain_l2_validator_events_realtime)
 

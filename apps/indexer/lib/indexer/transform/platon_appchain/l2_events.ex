@@ -13,6 +13,7 @@ defmodule Indexer.Transform.PlatonAppchain.L2Events do
   """
   @spec parse(list()) :: list()
   def parse(logs) do
+    Logger.debug("to parse L2Events")
     prev_metadata = Logger.metadata()
     Logger.metadata(fetcher: :platon_appchan_l2_events_realtime)
 

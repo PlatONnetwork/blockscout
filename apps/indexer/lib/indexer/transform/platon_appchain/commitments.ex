@@ -13,6 +13,7 @@ defmodule Indexer.Transform.PlatonAppchain.Commitments do
   """
   @spec parse(list(), list()) :: list()
   def   parse(logs, json_rpc_named_arguments) do
+    Logger.debug("to parse Commitments")
     prev_metadata = Logger.metadata()
     Logger.metadata(fetcher: :platon_appchan_l2_commitments_realtime)
 

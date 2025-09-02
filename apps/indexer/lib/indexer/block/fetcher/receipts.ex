@@ -65,6 +65,9 @@ defmodule Indexer.Block.Fetcher.Receipts do
         end
       end)
 
+
+    Logger.debug("set_block_number_to_logs:(#{inspect(logs)}")
+
     %{params | logs: logs_with_block_numbers}
   end
 

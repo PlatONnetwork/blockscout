@@ -839,7 +839,7 @@ config :indexer, Indexer.Fetcher.PolygonEdge.WithdrawalExit,
   exit_helper: System.get_env("INDEXER_POLYGON_EDGE_L1_EXIT_HELPER_CONTRACT")
 
 
-## for Platon Appchain
+## for Platon Appchain 如果是ConfigHelper.chain_type() == :platon_appchain，则启动supervisor
 config :indexer, Indexer.Fetcher.PlatonAppchain.Supervisor, enabled: ConfigHelper.chain_type() == :platon_appchain
 config :indexer, Indexer.Fetcher.PlatonAppchain.L1Event.Supervisor, enabled: ConfigHelper.chain_type() == :platon_appchain
 config :indexer, Indexer.Fetcher.PlatonAppchain.L1Execute.Supervisor, enabled: ConfigHelper.chain_type() == :platon_appchain
