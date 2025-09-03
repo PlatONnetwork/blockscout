@@ -79,6 +79,9 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     %{ true => registered_events } = registered_events_and_others
     Logger.debug("to import L2ValidatorEvents (registered_events):  #{inspect(registered_events)}")
 
+    %{ false => updated_events } = registered_events_and_others
+    Logger.debug("to import L2ValidatorEvents (updated_events):  #{inspect(updated_events)}")
+
     import_result =
     multi
     |> Multi.run(:insert_l2_validator_events, fn repo, _ ->
