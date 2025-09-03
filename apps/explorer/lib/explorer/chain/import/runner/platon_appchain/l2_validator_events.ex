@@ -71,16 +71,16 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     # event_groups是个map，key: true / false value: [2_validator_event]
     registered_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:ValidatorRegistered] end)
 
-    # 状态修改，一般都是从正常 -> 其它状态(退出状态)
-    exit_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:UpdateValidatorStatus] end)
-
-    Logger.debug("to import L2ValidatorEvents:  #{inspect(exit_events_and_others)}")
+    Logger.info("to import L2ValidatorEvents #{inspect(registered_events_and_others)}")
 
     %{ true => registered_events } = registered_events_and_others
-    Logger.debug("to import L2ValidatorEvents (registered_events):  #{inspect(registered_events)}")
+    Logger.info("to import L2ValidatorEvents (registered_events) #{inspect(registered_events)}")
 
     %{ false => updated_events } = registered_events_and_others
-    Logger.debug("to import L2ValidatorEvents (updated_events):  #{inspect(updated_events)}")
+    Logger.info("to import L2ValidatorEvents (updated_events) #{inspect(updated_events)}")
+
+    # 状态修改，一般都是从正常 -> 其它状态(退出状态)
+    # exit_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:UpdateValidatorStatus] end)
 
     import_result =
     multi
