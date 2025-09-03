@@ -881,23 +881,23 @@ config :indexer, Indexer.Fetcher.PlatonAppchain.Checkpoint,
        start_block_l1: System.get_env("INDEXER_PLATON_APPCHAIN_L1_START_BLOCK"),
        checkpoint_manager: System.get_env("INDEXER_PLATON_APPCHAIN_L1_CHECKPOINT_MANAGER_CONTRACT")
 
-#config :indexer, Indexer.Fetcher.PlatonAppchain.L2Event,
-#       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
-#       l2_state_sender: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STATE_SENDER_CONTRACT"),
-#       l2_reward_manager: System.get_env("INDEXER_PLATON_APPCHAIN_L2_REWARD_MANAGER_CONTRACT")
+config :indexer, Indexer.Fetcher.PlatonAppchain.L2Event,
+       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
+       l2_state_sender: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STATE_SENDER_CONTRACT"),
+       l2_reward_manager: System.get_env("INDEXER_PLATON_APPCHAIN_L2_REWARD_MANAGER_CONTRACT")
 
-#config :indexer, Indexer.Fetcher.PlatonAppchain.Commitment,
-#       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
-#       l2_state_receiver: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STATE_RECEIVER_CONTRACT")
+config :indexer, Indexer.Fetcher.PlatonAppchain.Commitment,
+       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
+       l2_state_receiver: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STATE_RECEIVER_CONTRACT")
 
-#config :indexer, Indexer.Fetcher.PlatonAppchain.L2Execute,
-#       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
-#       l2_state_receiver: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STATE_RECEIVER_CONTRACT")
-#
-#config :indexer, Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent,
-#       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
-#       l2_stake_handler: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STAKE_HANDLER_CONTRACT")
-#
+config :indexer, Indexer.Fetcher.PlatonAppchain.L2Execute,
+       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
+       l2_state_receiver: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STATE_RECEIVER_CONTRACT")
+
+config :indexer, Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent,
+       start_block_l2: System.get_env("INDEXER_PLATON_APPCHAIN_L2_START_BLOCK"),
+       l2_stake_handler: System.get_env("INDEXER_PLATON_APPCHAIN_L2_STAKE_HANDLER_CONTRACT")
+
 
 config :indexer, Indexer.Fetcher.ZkSync.TransactionBatch,
   chunk_size: ConfigHelper.parse_integer_env_var("INDEXER_ZKSYNC_BATCHES_CHUNK_SIZE", 50),
