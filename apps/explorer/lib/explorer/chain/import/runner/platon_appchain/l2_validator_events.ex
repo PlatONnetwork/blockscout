@@ -70,20 +70,21 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     # 把 l2_validator_events 按 action_type 是否是新增验证人 分组
     # event_groups是个map，key: true / false value: [2_validator_event]
     registered_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:ValidatorRegistered] end)
-
     Logger.info("to import L2ValidatorEvents #{inspect(registered_events_and_others)}")
 
-    %{ true => registered_events } = registered_events_and_others
+    registered_events = Map.get(registered_events_and_others, true, [])
+    updated_events = Map.get(registered_events_and_others, false, [])
+
+    #%{ true => registered_events } = registered_events_and_others
     Logger.info("to import L2ValidatorEvents (registered_events) #{inspect(registered_events)}")
 
-    %{ false => updated_events } = registered_events_and_others
+    #%{ false => updated_events } = registered_events_and_others
     Logger.info("to import L2ValidatorEvents (updated_events) #{inspect(updated_events)}")
 
     # 状态修改，一般都是从正常 -> 其它状态(退出状态)
     # exit_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:UpdateValidatorStatus] end)
 
-    import_result =
-    multi
+
     |> Multi.run(:insert_l2_validator_events, fn repo, _ ->
       Instrumenter.block_import_stage_runner(
         fn -> insert(repo, changes_list, insert_options) end,
@@ -92,11 +93,8 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
         :l2_validator_events
       )
     end)
-    |> Multi.run(:add_new_l2_validators, fn repo,
-                                                  %{
-                                                    true => registered_events
-                                                  } = registered_events_and_others
-                                                  when is_list(registered_events)  ->
+    |> Multi.run(:add_new_l2_validators, fn repo, registered_events
+                                                  when length(registered_events)  ->
       Instrumenter.block_import_stage_runner(
         fn -> register_validator(repo, registered_events, update_transactions_options) end,
         :l2_validators,
@@ -104,11 +102,8 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
         :register_l2_validators
       )
     end)
-    |> Multi.run(:update_l2_validators, fn repo,
-                                                  %{
-                                                    false => updated_events
-                                                  } = registered_events_and_others
-                                                  when is_list(updated_events)  ->
+    |> Multi.run(:update_l2_validators, fn repo,updated_events
+                                                  when length(updated_events)  ->
       Instrumenter.block_import_stage_runner(
         fn -> update_validator(repo, updated_events, update_transactions_options) end,
         :l2_validators,
@@ -123,7 +118,6 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
 
     import_result
   end
-
 
   defp register_validator(repo, l2_new_validator_events, %{timeout: timeout, timestamps: timestamps})  do
     registered_validator_hash_list =
