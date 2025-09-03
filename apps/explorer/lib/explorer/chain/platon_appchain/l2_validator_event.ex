@@ -60,7 +60,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2ValidatorEvent do
     module
     |> cast(attrs, @allowed_attrs)
     |> validate_required(@required_attrs)
-    |> unique_constraint([:hash, :log_index, :validator_hash])
+    |> unique_constraint([:hash, :log_index])
   end
 
   @spec get_undelegate_events_by_epoch_range(integer(), integer()) :: list()
