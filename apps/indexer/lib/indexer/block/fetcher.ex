@@ -157,28 +157,12 @@ defmodule Indexer.Block.Fetcher do
          %{transaction_actions: transaction_actions} = TransactionActions.parse(logs),
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
 
-         chain_type1 = if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
-           do: :platon_appchain1,
-           else: :no_chain_type1
-         ),
-         Logger.debug("test chain_type1 #{inspect(chain_type1)}"),
-         Logger.debug("test chain_type2", chain_type1),
+#         chain_type1 = if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
+#           do: :platon_appchain1,
+#           else: :no_chain_type1
+#         ),
+#         Logger.debug("test chain_type1 #{inspect(chain_type1)}"),
 
-
-         chain_type2 = if(System.get_env("CHAIN_TYPE") == :platon_appchain,
-           do: :platon_appchain2,
-           else: :no_chain_type2
-         ),
-         Logger.debug("test chain_type3 #{inspect(chain_type2)}"),
-         Logger.debug("test chain_type4", chain_type2),
-
-         chain_type3 = System.get_env("CHAIN_TYPE"),
-         Logger.debug("test chain_type5", chain_type3),
-         Logger.debug("test chain_type6 #{inspect(chain_type3)}"),
-
-         chain_type4 =  Application.get_env(:explorer, :chain_type),
-         Logger.debug("test chain_type7", chain_type4),
-         Logger.debug("test chain_type8 #{inspect(chain_type4)}"),
 
          # 获取 platon_appchain的事件
          l2_events =
