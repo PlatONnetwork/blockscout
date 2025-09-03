@@ -26,7 +26,7 @@ defmodule Indexer.Transform.PlatonAppchain.L2ValidatorEvents do
         l2_stake_handler = String.downcase(l2_stake_handler)
         event_signatures = L2ValidatorEvent.event_signatures()
 
-        Logger.debug("to parse L2ValidatorEvents-2")
+        # Logger.debug("to parse L2ValidatorEvents-2")
 
         logs
         |> Enum.filter(fn log ->
