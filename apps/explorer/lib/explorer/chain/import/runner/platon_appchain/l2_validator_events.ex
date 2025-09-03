@@ -217,7 +217,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     Import.insert_changes_list(
       repo,
       ordered_changes_list,
-      conflict_target: [:hash, :log_index, :validator_hash],
+      conflict_target: [:hash, :log_index],
       on_conflict: on_conflict,
       for: L2ValidatorEvent,
       returning: true,

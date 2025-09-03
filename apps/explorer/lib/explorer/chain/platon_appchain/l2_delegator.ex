@@ -54,7 +54,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Delegator do
     module
     |> cast(attrs, @allowed_attrs)  # 确保@allowed_attrs中指定的key才会赋值到结构体中
     |> validate_required(@required_attrs)
-    |> unique_constraint(:delegator_hash, :validator_hash)
+    |> unique_constraint([:delegator_hash, :validator_hash])
   end
 
   @spec update_changeset(Ecto.Schema.t(), map()) :: Ecto.Schema.t()
@@ -62,7 +62,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Delegator do
     module
     |> cast(params, @allowed_attrs)
     |> validate_required(@required_attrs)
-    |> unique_constraint(:delegator_hash, :validator_hash)
+    |> unique_constraint([:delegator_hash, :validator_hash])
   end
 
   # 修改已提取的委托奖励, 如果increment就是负数，就是减少委托
