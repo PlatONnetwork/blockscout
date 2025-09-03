@@ -84,7 +84,8 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     # 状态修改，一般都是从正常 -> 其它状态(退出状态)
     # exit_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:UpdateValidatorStatus] end)
 
-
+    import_result =
+    multi
     |> Multi.run(:insert_l2_validator_events, fn repo, _ ->
       Instrumenter.block_import_stage_runner(
         fn -> insert(repo, changes_list, insert_options) end,
