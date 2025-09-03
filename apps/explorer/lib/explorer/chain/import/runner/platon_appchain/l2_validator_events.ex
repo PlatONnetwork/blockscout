@@ -95,7 +95,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
       )
     end)
     |> Multi.run(:add_new_l2_validators, fn repo, registered_events
-                                                  when length(registered_events)  ->
+                                                  when length(registered_events) > 0  ->
       Instrumenter.block_import_stage_runner(
         fn -> register_validator(repo, registered_events, update_transactions_options) end,
         :l2_validators,
@@ -104,7 +104,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
       )
     end)
     |> Multi.run(:update_l2_validators, fn repo,updated_events
-                                                  when length(updated_events)  ->
+                                                  when length(updated_events) > 0  ->
       Instrumenter.block_import_stage_runner(
         fn -> update_validator(repo, updated_events, update_transactions_options) end,
         :l2_validators,
