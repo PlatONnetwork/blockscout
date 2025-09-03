@@ -31,15 +31,16 @@ defmodule Indexer.Transform.PlatonAppchain.L2ValidatorEvents do
         logs
         |> Enum.filter(fn log ->
 
-          Logger.debug("to parse L2ValidatorEvents-3 log: #{inspect(log)}")
+          #Logger.debug("to parse L2ValidatorEvents-3 log: #{inspect(log)}")
 
           result = !is_nil(log.first_topic) && Enum.member?(event_signatures, String.downcase(log.first_topic)) &&
             String.downcase(Helper.address_hash_to_string(log.address_hash)) == l2_stake_handler
-          Logger.debug("L2ValidatorEvents3:(#{inspect(result)}")
+          #Logger.debug("L2ValidatorEvents3:(#{inspect(result)}")
             result
         end)
         |> Enum.reduce([], fn log, acc ->
-          Logger.info("to parse L2ValidatorEvents-4, log: #{inspect(log)}.")
+          Logger.info("L2 (Stake Event) message found, validator: #{log.second_topic}.")
+
           # todo:
           # l2_events.ex等几个文件中，为什么没有用Enum.reduce递归，而是直接用了一个Enum.map？
           acc ++ L2ValidatorEvent.event_to_l2_validator_events(
