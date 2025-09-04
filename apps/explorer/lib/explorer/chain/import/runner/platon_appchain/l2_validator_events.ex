@@ -94,23 +94,29 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
         :l2_validator_events
       )
     end)
-    |> Multi.run(:add_new_l2_validators, fn repo, registered_events
-                                                  when length(registered_events) > 0  ->
-      Instrumenter.block_import_stage_runner(
-        fn -> register_validator(repo, registered_events, update_transactions_options) end,
-        :l2_validators,
-        :l2_validators,
-        :register_l2_validators
-      )
+    |> Multi.run(:add_new_l2_validators, fn repo, _ ->
+       if length(registered_events) > 0 do
+         Instrumenter.block_import_stage_runner(
+           fn -> register_validator(repo, registered_events, update_transactions_options) end,
+           :l2_validators,
+           :l2_validators,
+           :register_l2_validators
+         )
+       else
+         {:ok, []}
+       end
     end)
-    |> Multi.run(:update_l2_validators, fn repo,updated_events
-                                                  when length(updated_events) > 0  ->
-      Instrumenter.block_import_stage_runner(
-        fn -> update_validator(repo, updated_events, update_transactions_options) end,
-        :l2_validators,
-        :l2_validators,
-        :update_l2_validators
-      )
+    |> Multi.run(:update_l2_validators, fn repo, _ ->
+      if length(updated_events) > 0 do
+        Instrumenter.block_import_stage_runner(
+          fn -> update_validator(repo, updated_events, update_transactions_options) end,
+          :l2_validators,
+          :l2_validators,
+          :update_l2_validators
+        )
+      else
+        {:ok, []}
+      end
     end)
 
     # 添加成功通过ws给前端发消息 begin
@@ -132,6 +138,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
         {:error, _reason} -> throw({:error, "add new validator(s) failed"})
       end
     end)
+    {:ok, []}
   end
 
   defp update_validator(repo, l2_validator_updated_events, %{timeout: timeout, timestamps: timestamps})  do
@@ -148,7 +155,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
         {:error, _reason} -> throw({:error, "update validator(s) failed"})
       end
     end)
-    {:ok, "update validator(s) successfully"}
+    {:ok, []}
   end
 
 
