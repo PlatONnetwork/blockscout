@@ -188,10 +188,10 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         on: l2e.event_id >= c.start_id and l2e.event_id <= c.end_id,
         select: %{
           event_id: l1e.event_id,
-          l1_event_hash: l1e.l1e_hash,
+          l1_event_hash: l1e.hash,
           tx_type: l1e.tx_type,
-          block_timestamp: l1e.l1e_block_timestamp,
-          l2_event_hash: l2e.l2e_hash,
+          block_timestamp: l1e.block_timestamp,
+          l2_event_hash: l2e.hash,
           replay_status: coalesce(l2e.replay_status,0),
           start_id: coalesce(c.start_id,0),
           end_id: coalesce(c.end_id,0),
