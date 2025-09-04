@@ -66,17 +66,17 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
     {:noreply, state}
   end
 
-  @spec get_l2_block_number_by_event_id(non_neg_integer()) :: {non_neg_integer() | nil}
-  def get_l2_block_number_by_event_id(event_id) do
+  @spec get_l2_event_by_event_id(non_neg_integer()) :: {non_neg_integer() | nil}
+  def get_l2_event_by_event_id(l2_event_id) do
     query =
       from(l2_events in L2Event,
-        select: {l2_events.block_number},
-        where: l2_events.event_id <= ^event_id,
+        select: {l2_events.block_number, l2_events.tx_type, l2_events.amount},
+        where: l2_events.event_id = ^l2_event_id,
         limit: 1
       )
     query
     |> Repo.one()
-    |> Kernel.||({nil})
+    |> Kernel.||({nil, nil})
   end
 
   @spec get_checkpoint_hash_by_block_number(non_neg_integer()) :: {binary() | nil}
@@ -95,16 +95,23 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
   @spec prepare_events(list(), list()) :: list()
   def prepare_events(events, _json_rpc_named_arguments) do
     Enum.map(events, fn event ->
+      #这个实际上是发生在L2上的event_id
       event_id = quantity_to_integer(Enum.at(event["topics"], 1)) #l2上收集状态变更事件组成checkpoint的截至块高（L2上生成checkpoint的块高的前3个块高）。事实上，checkpoint收集的装备变更事件，是跨epoch的。
       replay_status = quantity_to_integer(Enum.at(event["topics"], 2)) #quantity_to_integer 16进制字符串转成integer
 
+      Logger.debug("prepare_events for l1_execute, event_id: #{inspect(event_id)}, replay_status: #{inspect(replay_status)}")
 
       # 查询event_id所属的交易事件在l2的区块号
-      { l2_blockNumber} = get_l2_block_number_by_event_id(event_id)
+      {l2_blockNumber, l2_tx_type, l2_amount} = get_l2_event_by_event_id(event_id)
+      Logger.debug("prepare_events for l1_execute, l2_blockNumber: #{inspect(l2_blockNumber)}")
+
       # 根据区块号去查寻对应的checkpoint交易的交易hash
-      { checkpoint_hash} = get_checkpoint_hash_by_block_number(l2_blockNumber)
+      {checkpoint_hash} = get_checkpoint_hash_by_block_number(l2_blockNumber)
       %{
         event_id: event_id,
+        block_number: l2_blockNumber,
+        tx_type: l2_tx_type,
+        amount: l2_amount,
         hash: event["transactionHash"],
         checkpoint_hash: checkpoint_hash,
         replay_status: replay_status,
