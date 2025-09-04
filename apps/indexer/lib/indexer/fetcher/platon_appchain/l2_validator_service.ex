@@ -26,7 +26,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
     exit_info =
       cond do
-        PlatonAppchain.l2_validator_is_unstaked(validatorInfoMap.amount) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Unstaked"}
+        PlatonAppchain.l2_validator_is_unstaked(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Unstaked"}
         PlatonAppchain.l2_validator_is_slashed(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashing"}
         PlatonAppchain.l2_validator_is_duplicated(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Duplicated"}
         PlatonAppchain.l2_validator_is_lowBlocks(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowBlocks"}
