@@ -6,6 +6,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
   use Bitwise
   alias Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler
   alias Explorer.Chain
+  alias Explorer.Chain.Hash
   alias Explorer.Chain.PlatonAppchain.L2Validator
   alias Indexer.Fetcher.PlatonAppchain
 
@@ -18,7 +19,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
   end
 
   @spec update_validator_by_event(Repo.t(), map()) :: {:ok, integer()} | {:error, reason :: String.t()}
-  def update_validator_by_event(repo, event) do
+  def update_validator_by_event(repo, event) d
     validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash))
 
     lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())
