@@ -76,7 +76,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
       )
     query
     |> Repo.one()
-    |> Kernel.||({nil, nil})
+    |> Kernel.||({nil, nil,nil})
   end
 
   @spec get_checkpoint_hash_by_block_number(non_neg_integer()) :: {binary() | nil}
