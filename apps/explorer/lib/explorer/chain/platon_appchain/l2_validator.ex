@@ -121,14 +121,14 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
     |> unique_constraint(:validator_hash)
   end
 
-  @spec update_validator(Ecto.Repo.t(), map()) :: {:ok, Ecto.Schema.t()} | {:eroror, reason :: String.t()}
+  @spec update_validator(Ecto.Repo.t(), map()) :: {:ok, Ecto.Schema.t()} | {:error, reason :: String.t()}
   def update_validator(repo, dataMap) do
     repo.get_by(__MODULE__, validator_hash: dataMap.validator_hash)
     |> changeset(dataMap)
     |> repo.update()
   end
 
-  @spec upsert_validator(Ecto.Repo.t(), map()) :: {:ok, Ecto.Schema.t()} | {:eroror, reason :: String.t()}
+  @spec upsert_validator(Ecto.Repo.t(), map()) :: {:ok, Ecto.Schema.t()} | {:error, reason :: String.t()}
   def upsert_validator(repo, dataMap) do
     %__MODULE__{}
     |> changeset(dataMap)  # 确保@allowed_attrs中指定的key才会赋值到结构体中
