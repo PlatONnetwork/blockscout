@@ -71,7 +71,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
     query =
       from(l2_events in L2Event,
         select: {l2_events.block_number, l2_events.tx_type, l2_events.amount},
-        where: l2_events.event_id = ^l2_event_id,
+        where: l2_events.event_id == ^l2_event_id,
         limit: 1
       )
     query
