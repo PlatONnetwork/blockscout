@@ -3,7 +3,8 @@ defmodule Explorer.Chain.PlatonAppchain.L1Execute do
 
   alias Explorer.Chain.{
     Hash,
-    Block
+    Block,
+    Wei
     }
 
   @optional_attrs ~w(amount replay_status)a
