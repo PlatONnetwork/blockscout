@@ -25,6 +25,8 @@ defmodule Explorer.Chain.PlatonAppchain.L1Execute do
                hash:  Hash.t(),
                block_number:  Block.block_number(),
                checkpoint_hash:  Hash.t(),
+               tx_type:  non_neg_integer(),
+               amount: Wei.t(),
                replay_status:  non_neg_integer() | nil,
                status:  non_neg_integer()
              }
@@ -36,7 +38,7 @@ defmodule Explorer.Chain.PlatonAppchain.L1Execute do
     field(:block_number, :integer)
     field(:checkpoint_hash, Hash.Full)
     field(:tx_type, :integer)
-    field(:amount, :integer)
+    field(:amount, Wei)
     field(:replay_status, :integer)
     field(:status, :integer)
 
