@@ -98,9 +98,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
       #这个实际上是发生在L2上的event_id
       event_id = quantity_to_integer(Enum.at(event["topics"], 1)) #l2上收集状态变更事件组成checkpoint的截至块高（L2上生成checkpoint的块高的前3个块高）。事实上，checkpoint收集的装备变更事件，是跨epoch的。
       replay_status = quantity_to_integer(Enum.at(event["topics"], 2)) #quantity_to_integer 16进制字符串转成integer
-      blockNumber = event["blockNumber"]
+      blockNumber = quantity_to_integer(event["blockNumber"])
 
-      Logger.debug("prepare_events for l1_execute, event_id: #{inspect(event_id)}, replay_status: #{inspect(replay_status)}")
+      Logger.debug("prepare_events for l1_execute, event: #{inspect(event)}, event_id: #{event_id}, blockNumber: #{blockNumber}, replay_status: #{replay_status}")
 
       # 查询event_id所属的交易事件在l2的区块号
       # 2025/09/05 不用去查询l2的信息，而是在页面展示时再去用SQL查询
@@ -113,7 +113,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
 
       %{
         event_id: event_id,
-        block_number: quantity_to_integer(event["blockNumber"]),
+        block_number: blockNumber,
         hash: event["transactionHash"],
         replay_status: replay_status,
         status: 1
