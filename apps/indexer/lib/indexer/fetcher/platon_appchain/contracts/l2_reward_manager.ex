@@ -1,4 +1,5 @@
 defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2RewardManager do
+
   @moduledoc """
   L2 reward manager contract interface encapsulation
   """
@@ -39,8 +40,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2RewardManager do
   ## Returns
     * Pending reward for the given account(validator)
   """
-  def pendingValidatorRewards(validator) do
-    result = pending_validator_rewards(validator) |> Ethers.call(to: l2RewardManagerContract(), rpc_opts: rpc_opts())
+  def pendingValidatorRewards(validator_hex) do
+    result = pending_validator_rewards(validator_hex) |> Ethers.call(to: l2RewardManagerContract(), rpc_opts: rpc_opts())
     {:ok, pendingRewards} = result
     pendingRewards
   end
@@ -55,8 +56,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2RewardManager do
   ## Returns
     * Pending reward of delegator for the given account(validator)
   """
-  def pendingDelegatorRewards(validator, delegator) do
-    result = pending_delegator_rewards(validator, delegator) |> Ethers.call(to: l2RewardManagerContract(), rpc_opts: rpc_opts())
+  def pendingDelegatorRewards(validator_hex, delegator_hex) do
+    result = pending_delegator_rewards(validator_hex, delegator_hex) |> Ethers.call(to: l2RewardManagerContract(), rpc_opts: rpc_opts())
     {:ok, pendingRewards} = result
     pendingRewards
   end

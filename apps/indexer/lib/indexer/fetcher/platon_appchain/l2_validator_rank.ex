@@ -72,9 +72,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorRank do
         |> Enum.map(fn {element, idx} ->  {
              element[:validator_hash],
                                   idx,
-              L2StakeHandler.pendingWithdrawalsOfStake(element[:validator_hash]),
-              L2StakeHandler.withdrawableOfStake(element[:validator_hash]),
-              L2RewardManager.pendingValidatorRewards(element[:validator_hash])
+              L2StakeHandler.pendingWithdrawalsOfStake(element[:validator_hash]), # rpc返回的地址都是hex string
+              L2StakeHandler.withdrawableOfStake(element[:validator_hash]), # rpc返回的地址都是hex string
+              L2RewardManager.pendingValidatorRewards(element[:validator_hash]) # rpc返回的地址都是hex string
           } end)
 
       L2ValidatorService.update_rank_and_amount(rank_tuple_list)

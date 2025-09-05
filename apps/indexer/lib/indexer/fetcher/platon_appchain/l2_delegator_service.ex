@@ -78,9 +78,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2DelegatorService do
       #      %{validator_hash: "0x01", delegator_hash: "0x0202"},
       #      %{validator_hash: "0x02", delegator_hash: "0x0202"},
       #    ]
+      #event是从数据库拿出的， validator_hash是 bytea类型
       Enum.reduce(total_delegator_events, MapSet.new(), fn event, acc -> MapSet.put(acc, %{validator_hash: event.validator_hash, delegator_hash: event.delegator_hash}) end)
     end
-
+    # validator_hash / delegator_hash，是 bytea类型
     if Enum.empty?(unique_delegator_validator) == false do
       L2Delegator.update_delegations(L2StakeHandler.getDelegateDetails(unique_delegator_validator))
     end

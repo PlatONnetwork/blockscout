@@ -151,6 +151,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   }
   ]
   """
+  @spec getValidatorsWithAddr(list(String.t())) :: map()
   def getValidatorsWithAddr(validator_addresses) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
     result = get_validators_with_addr(validator_addresses) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
@@ -170,7 +171,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
           validator_hash: "0x97ab3d4f7f5051f127b0e9f8d10772125d94d65b"
         }
   """
-  @spec getValidator(binary()) :: map()
+  @spec getValidator(String.t()) :: map()
   def getValidator(validator_hex) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
     result = get_validators_with_addr([validator_hex]) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
@@ -250,10 +251,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
    #      "validatorAddr" => "0x70d207c1322ccb9069d3790d6768866dabff1035"
    #    }]
   """
-  @spec getDelegationsWithValidator(list(), binary()) :: {list()}
-  def getDelegationsWithValidator(validators, delegator) do
+  @spec getDelegationsWithValidator(list(), String.t()) :: {list()}
+  def getDelegationsWithValidator(validators_hex, delegator_hex) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getDelegationsWithValidator
-    result =  get_delegations_with_validator(validators, delegator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
+    result =  get_delegations_with_validator(validators_hex, delegator_hex) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, delegations} = result
     delegationJson = delegations |> Enum.map(fn delegation -> convertDelegationToJSON(delegation) end)
     delegationJson
@@ -270,10 +271,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     * Amount not yet withdrawable
 
   """
-  @spec pendingWithdrawalsOfDelegate(binary(), binary()) :: {non_neg_integer()}
-  def pendingWithdrawalsOfDelegate(validator, delegator) do
+  @spec pendingWithdrawalsOfDelegate(String.t(), String.t()) :: {non_neg_integer()}
+  def pendingWithdrawalsOfDelegate(validator_hex, delegator_hex) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，pendingWithdrawalsOfDelegate
-    result = pending_withdrawals_of_delegate(validator, delegator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
+    result = pending_withdrawals_of_delegate(validator_hex, delegator_hex) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, pendingWithdrawals} = result
     pendingWithdrawals
   end
@@ -287,10 +288,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   ## Returns
     * Amount not yet withdrawable
   """
-  @spec pendingWithdrawalsOfStake(binary()) :: {non_neg_integer()}
-  def pendingWithdrawalsOfStake(validator) do
+  @spec pendingWithdrawalsOfStake(String.t()) :: {non_neg_integer()}
+  def pendingWithdrawalsOfStake(validator_hex) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，pendingWithdrawalsOfStake
-    result = pending_withdrawals_of_stake(validator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
+    result = pending_withdrawals_of_stake(validator_hex) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, pendingWithdrawals} = result
     pendingWithdrawals
   end
@@ -305,10 +306,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   ## Returns
     * Amount withdrawable
   """
-  @spec withdrawableOfDelegate(binary(), binary()) :: {non_neg_integer()}
-  def withdrawableOfDelegate(validator, delegator) do
+  @spec withdrawableOfDelegate(String.t(), String.t()) :: {non_neg_integer()}
+  def withdrawableOfDelegate(validator_hex, delegator_hex) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，withdrawableOfDelegate
-    result = withdrawable_of_delegate(validator, delegator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
+    result = withdrawable_of_delegate(validator_hex, delegator_hex) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, withdrawable} = result
     withdrawable
   end
@@ -323,9 +324,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     * Amount withdrawable
   """
   @spec withdrawableOfStake(String.t()) :: {non_neg_integer()}
-  def withdrawableOfStake(validator) do
+  def withdrawableOfStake(validator_hex) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，withdrawableOfStake
-    result = withdrawable_of_stake(validator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
+    result = withdrawable_of_stake(validator_hex) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, withdrawable} = result
     withdrawable
   end
@@ -354,9 +355,12 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   end
 
   defp getDelegatorDetails(delegator_hash, validator_hash) do
-    withdrawal_delegate_amount = withdrawableOfDelegate(validator_hash, delegator_hash)
-    locking_delegate_amount = pendingWithdrawalsOfDelegate(validator_hash, delegator_hash)
-    delegation_info =  getDelegationsWithValidator([validator_hash], delegator_hash)
+    delegator_hash_hex = Hash.to_string(event.delegator_hash)
+    validator_hash_hex = Hash.to_string(event.validator_hash)
+
+    withdrawal_delegate_amount = withdrawableOfDelegate(validator_hash_hex, delegator_hash_hex)
+    locking_delegate_amount = pendingWithdrawalsOfDelegate(validator_hash_hex, delegator_hash_hex)
+    delegation_info =  getDelegationsWithValidator([validator_hash_hex], delegator_hash_hex)
     %{delegator_hash: delegator_hash, validator_hash: validator_hash, withdrawal_delegate_amount: withdrawal_delegate_amount, locking_delegate_amount: locking_delegate_amount,  delegate_amount: delegation_info.delegate_amount}
   end
 
