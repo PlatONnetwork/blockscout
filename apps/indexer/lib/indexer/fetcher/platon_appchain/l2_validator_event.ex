@@ -56,6 +56,14 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
         "Slashed"
       @l2_biz_event_UpdateValidatorStatus ->
         "UpdateValidatorStatus"
+      @l2_biz_event_StakeWithdrawalRegistered ->
+        "StakeWithdrawalRegistered"
+      @l2_biz_event_StakeWithdrawal ->
+        "StakeWithdrawal"
+      @l2_biz_event_DelegateWithdrawalRegistered ->
+        "DelegateWithdrawalRegistered"
+      @l2_biz_event_DelegateWithdrawal ->
+        "DelegateWithdrawal"
     end
     event_name
   end
