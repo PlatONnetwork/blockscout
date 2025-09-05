@@ -232,7 +232,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
       from(
         c in Checkpoint,
         right_join: event_cnt in subquery(count_subquery),
-        on: event_cnt.epoch = c.epoch,
+        on: event_cnt.epoch == c.epoch,
 
         select: %{
           epoch: c.epoch,
