@@ -280,8 +280,13 @@ defmodule BlockScoutWeb.Notifier do
   end
 
   defp broadcast_l1_to_l2_txn(event) do
+    Logger.debug("broadcast_l1_to_l2_txn, event #{inspect(event)}")
+
     l1_to_l2_txn =  Query.get_l1_to_l2_txn_by_hash(event.hash)
-    if Map.size(l1_to_l2_txn) > 0 do
+
+    Logger.debug("broadcast_l1_to_l2_txn, l1_to_l2_txn #{inspect(l1_to_l2_txn)}")
+
+    if l1_to_l2_txn != nil do
       Endpoint.broadcast("platon_appchain:l1_to_l2_txn", "l1_to_l2_txn",%{
         "no" => l1_to_l2_txn.event_id,
         "l1_txn_hash" => l1_to_l2_txn.l1_event_hash,
@@ -297,14 +302,13 @@ defmodule BlockScoutWeb.Notifier do
   end
 
   defp broadcast_l2_to_l1_txn(event) do
-    Logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.")
-    Logger.info("broadcast_l2_to_l1_txn  event #{inspect(event)}")
+    Logger.debug("broadcast_l2_to_l1_txn, event #{inspect(event)}")
 
     l2_to_l1_txn =  Query.get_l2_to_l1_txn_by_hash(event.hash)
 
-    Logger.info("broadcast_l2_to_l1_txn  l2_to_l1_txn #{inspect(l2_to_l1_txn)}")
+    Logger.debug("broadcast_l2_to_l1_txn, l2_to_l1_txn #{inspect(l2_to_l1_txn)}")
 
-    if Map.size(l2_to_l1_txn) > 0 do
+    if l2_to_l1_txn != nil do
       Endpoint.broadcast("platon_appchain:l2_to_l1_txn", "l2_to_l1_txn",%{
         "no" => l2_to_l1_txn.event_id,
         "from" => l2_to_l1_txn.from,
