@@ -19,6 +19,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Execute do
   alias Explorer.Chain.PlatonAppchain.Commitment
   alias Explorer.Chain.PlatonAppchain.L2Execute
   alias Indexer.Fetcher.PlatonAppchain
+  alias Explorer.Chain.Events.Publisher
 
   @fetcher_name :platon_appchain_l2_execute
 
@@ -177,7 +178,6 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Execute do
             json_rpc_named_arguments,
             100_000_000
           )
-
         Enum.map(result, fn event ->
           event_to_l2_execute(
             Enum.at(event["topics"], 1),
@@ -187,13 +187,15 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Execute do
           )
         end)
       end
-
     {:ok, _} =
       Chain.import(%{
         l2_executes: %{params: executes},
         timeout: :infinity
       })
-
+    if not scan_db  and length(executes)>0 do
+      Logger.debug("Publisher.broadcast: #{inspect(executes)}}")
+      Publisher.broadcast(%{l1_to_l2_txn: executes}, :realtime)
+    end
     Enum.count(executes)
   end
 
