@@ -86,7 +86,6 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.Checkpoints do
           start_block_number: fragment("EXCLUDED.start_block_number"),
           end_block_number: fragment("EXCLUDED.end_block_number"),
           state_root: fragment("EXCLUDED.state_root"),
-          event_counts: fragment("EXCLUDED.event_counts"),
           block_number: fragment("EXCLUDED.block_number"),
           hash: fragment("EXCLUDED.hash"),
           block_timestamp: fragment("EXCLUDED.block_timestamp"),
@@ -98,12 +97,11 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.Checkpoints do
       ],
       where:
         fragment(
-          "(EXCLUDED.start_block_number,EXCLUDED.end_block_number,EXCLUDED.state_root,EXCLUDED.event_counts,EXCLUDED.block_number,
-          EXCLUDED.hash,EXCLUDED.block_timestamp,EXCLUDED.from,EXCLUDED.tx_fee) IS DISTINCT FROM (?,?,?,?,?,?,?,?,?)", # 有冲突时只更新这些字段
+          "(EXCLUDED.start_block_number,EXCLUDED.end_block_number,EXCLUDED.state_root,EXCLUDED.block_number,
+          EXCLUDED.hash,EXCLUDED.block_timestamp,EXCLUDED.from,EXCLUDED.tx_fee) IS DISTINCT FROM (?,?,?,?,?,?,?,?)", # 有冲突时只更新这些字段
           l.start_block_number,
           l.end_block_number,
           l.state_root,
-          l.event_counts,
           l.block_number,
           l.hash,
           l.block_timestamp,

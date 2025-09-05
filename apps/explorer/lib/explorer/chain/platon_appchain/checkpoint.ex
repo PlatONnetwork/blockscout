@@ -17,7 +17,6 @@ defmodule Explorer.Chain.PlatonAppchain.Checkpoint do
   * `start_block_number` - checkpoint收集的事件的L2开始块高（epoch开始的前3个块高）
   * `end_block_number` - checkpoint收集事件的l2上截至块高（epoch结束的前3个块高）
   * `state_root` - state root
-  * `event_counts` - checkpoint总包含的事件数（另起线程统计l2_events中数据）
   * `block_number` - 交易所在L1区块
   * `hash` - checkpoint交易在L1上的hash
   * `block_timestamp` - checkpoint交易所在L1交易时间
@@ -29,7 +28,6 @@ defmodule Explorer.Chain.PlatonAppchain.Checkpoint do
                start_block_number:  Block.block_number(),
                end_block_number:  Block.block_number(),
                state_root:  Data.t(),
-               event_counts: non_neg_integer(),
                block_number: Block.block_number(),
                hash: Hash.t(),
                block_timestamp: DateTime.t() | nil,
@@ -43,7 +41,6 @@ defmodule Explorer.Chain.PlatonAppchain.Checkpoint do
     field(:start_block_number, :integer)
     field(:end_block_number, :integer)
     field(:state_root, Data)
-    field(:event_counts, :integer)
     field(:block_number, :integer)
     field(:hash, Hash.Full)
     field(:block_timestamp, :utc_datetime_usec)

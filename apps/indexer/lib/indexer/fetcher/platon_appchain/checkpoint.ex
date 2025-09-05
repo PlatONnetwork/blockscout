@@ -82,34 +82,32 @@ defmodule Indexer.Fetcher.PlatonAppchain.Checkpoint do
       l2_block_number = quantity_to_integer(event["blockNumber"])
       timestamps = PlatonAppchain.get_timestamps_by_events(events, json_rpc_named_arguments)
       #l2上的epoch，一个epoch长度的块高生成一个checkpoint
-      event_counts = get_event_counts(start_block_number, end_block_number)
-      if event_counts > 0 do
-       # 获取checkpoint的交易回执，并从回执中取得from、gas_used、gas_price
-        transactions_params = [%{gas: 1000000000,hash: event["transactionHash"]}]
-        {:ok, %{logs: logs_list, receipts: receipts_list}} = get_transaction_receipts_by_hash(transactions_params, json_rpc_named_arguments, 100)
-        [first_map | _]  =receipts_list
-        %{gas_price: gas_price,gas_used: gas_used,from: from } = first_map
-        tx_fee = gas_used |> Decimal.new() |> Decimal.mult(Decimal.new(gas_price))
+      # 2025/09/05 不用去查询event_counts，因为可能区间内的区块还没同步。页面展示用SQL查询
+      # event_counts = get_event_counts(start_block_number, end_block_number)
+      # 获取checkpoint的交易回执，并从回执中取得from、gas_used、gas_price
+      transactions_params = [%{gas: 1000000000,hash: event["transactionHash"]}]
+      {:ok, %{logs: logs_list, receipts: receipts_list}} = get_transaction_receipts_by_hash(transactions_params, json_rpc_named_arguments, 100)
+      [first_map | _]  =receipts_list
+      %{gas_price: gas_price,gas_used: gas_used,from: from } = first_map
+      tx_fee = gas_used |> Decimal.new() |> Decimal.mult(Decimal.new(gas_price))
 
-        %{epoch: quantity_to_integer(Enum.at(event["topics"], 1)),
-          start_block_number: start_block_number,
-          end_block_number: end_block_number,
-          state_root: event["data"],
-          event_counts: event_counts,
-          block_number: l2_block_number,
-          hash: event["transactionHash"],
-          block_timestamp: Map.get(timestamps, l2_block_number),
-          from: from,
-          tx_fee: tx_fee
-        }
-      else
-        %{} # 或者返回nil
-      end
+      %{epoch: quantity_to_integer(Enum.at(event["topics"], 1)),
+        start_block_number: start_block_number,
+        end_block_number: end_block_number,
+        state_root: event["data"],
+        block_number: l2_block_number,
+        hash: event["transactionHash"],
+        block_timestamp: Map.get(timestamps, l2_block_number),
+        from: from,
+        tx_fee: tx_fee
+      }
+
     end)
     |> Enum.filter(fn event -> event != nil and map_size(event) > 0 end)
   end
 
   # 统计在区块间, l2发生的包括在checkpoint的事件数量（需要同步到L1的事件）
+  # 2025/09/05 不用去查询event_counts，因为可能区间内的区块还没同步。页面展示用SQL查询
   defp get_event_counts(start_block_number, end_block_number) do
     from(l2_events in L2Event,
       select: fragment("count(*)"),

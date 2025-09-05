@@ -84,11 +84,8 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L1Executes do
       update: [
         set: [
           # Don't update `event_id` as it is a primary key and used for the conflict target
-          tx_type:  fragment("EXCLUDED.tx_type"),
-          amount:  fragment("EXCLUDED.amount"),
           hash: fragment("EXCLUDED.hash"),
           block_number: fragment("EXCLUDED.block_number"),
-          checkpoint_hash:  fragment("EXCLUDED.checkpoint_hash"),
           replay_status:  fragment("EXCLUDED.replay_status"),
           status:  fragment("EXCLUDED.status"),
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", l.inserted_at), # LEAST返回给定的最小值 EXCLUDED.inserted_at 表示已存在的值
@@ -97,13 +94,10 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L1Executes do
       ],
       where:
         fragment(
-          "(EXCLUDED.tx_type,EXCLUDED.amount,EXCLUDED.hash,EXCLUDED.block_number,EXCLUDED.checkpoint_hash,EXCLUDED.replay_status,
-          EXCLUDED.status) IS DISTINCT FROM (?,?,?,?,?,?,?)", # 有冲突时只更新这些字段
-          l.tx_type,
-          l.amount,
+          "(EXCLUDED.hash,EXCLUDED.block_number,EXCLUDED.checkpoint_hash,EXCLUDED.replay_status,
+          EXCLUDED.status) IS DISTINCT FROM (?,?,?,?,?)", # 有冲突时只更新这些字段
           l.hash,
           l.block_number,
-          l.checkpoint_hash,
           l.replay_status,
           l.status
         )
