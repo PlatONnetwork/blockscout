@@ -882,7 +882,9 @@ defmodule Indexer.Fetcher.PlatonAppchain do
           params = Map.get(l1_executes, :params, [])
 
           if length(params) > 0 do
-            Publisher.broadcast([{:l2_to_l1_txn, import_data}], :realtime)
+            # Publisher.broadcast([{:l2_to_l1_txn, import_data}], :realtime)
+
+            Publisher.broadcast([{:l2_to_l1_txn, params}], :realtime)
           end
         true ->
           :ignore
