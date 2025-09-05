@@ -159,7 +159,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
           hash: l.hash,
           block_timestamp: l.block_timestamp,
           block_number: l.block_number,
-          action_desc: l.action_desc
+          action_type: l.action_type
         },
         order_by: [desc: l.block_number]
       )
@@ -179,7 +179,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
         l in L2ValidatorEvent,
         select: %{
           amount: l.amount,
-          action_desc: l.action_desc
+          delegator_hash: l.delegator_hash
         },
         where: l.action_type == 3,
         order_by: [desc: l.block_number]

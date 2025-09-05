@@ -151,7 +151,7 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorView do
             "tx_hash" => action.hash,
             "block_timestamp" => action.block_timestamp,
             "block_number" => action.block_number,
-            "action_desc" => action.action_desc
+            "action_type" => action.action_type
           }
         end),
       next_page_params: next_page_params
@@ -166,7 +166,7 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorView do
       items:
         Enum.map(delegators, fn delegator ->
          %{
-           "delegator_address" => delegator.action_desc,
+           "delegator_address" => delegator.delegator_hash,
            "amount" => delegator.amount,
            "percentage" => "待处理"
          }
