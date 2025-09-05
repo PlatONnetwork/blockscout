@@ -193,7 +193,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Execute do
         timeout: :infinity
       })
     if not scan_db  and length(executes)>0 do
-      Logger.debug("Publisher.broadcast: #{inspect(executes)}}")
+      Logger.debug("Publisher.broadcast: #{inspect(executes)}")
       Publisher.broadcast(%{l1_to_l2_txn: executes}, :realtime)
     end
     Enum.count(executes)

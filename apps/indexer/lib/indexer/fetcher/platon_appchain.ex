@@ -882,7 +882,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
           params = Map.get(l1_executes, :params, [])
 
           if length(params) > 0 do
-            Logger.debug("to broadcast l2_to_l1_txn: #{import_data}}")
+            Logger.debug("to broadcast l2_to_l1_txn: #{import_data}")
             Publisher.broadcast(%{l2_to_l1_txn: events}, :realtime)
 
             #Publisher.broadcast([{:l2_to_l1_txn, params}], :realtime)
