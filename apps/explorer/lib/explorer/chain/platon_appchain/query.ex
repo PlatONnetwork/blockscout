@@ -222,10 +222,10 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
     count_subquery =
       from(
         l2c in Checkpoint,
-        left_join: le2 in L2Event,
+        left_join: l2e in L2Event,
         on: l2e.block_number >= l2c.start_block_number and l2e.block_number <= l2c.end_block_number,
         group_by: l2c.epoch,
-        select: %{epoch: c.epoch, event_counts: coalesce(count(l2e.event_id),0)}
+        select: %{epoch: l2c.epoch, event_counts: coalesce(count(l2e.event_id),0)}
       )
 
     base_query =
