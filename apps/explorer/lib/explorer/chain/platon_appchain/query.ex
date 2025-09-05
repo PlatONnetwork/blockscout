@@ -127,7 +127,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         left_join: l1e in L1Execute,
         on: l1e.event_id == l2e.event_id,
         left_join: c in Checkpoint,
-        on: l1e.checkpoint_hash == c.hash,
+        on: c.start_block_number >= l2e.block_number and c.end_block_number <= l2e.block_number,
         select: %{
           event_id: l2e.event_id,
           from: l2e.from,
@@ -136,7 +136,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
           block_timestamp: l2e.block_timestamp,
           start_block_number: coalesce(c.start_block_number, 0),
           end_block_number: coalesce(c.end_block_number, 0),
-          checkpoint_hash: l1e.checkpoint_hash,
+          checkpoint_hash: c.hash,
           state_root: c.state_root,
           l1_exec_hash: l1e.hash,
           replay_status: coalesce(l1e.replay_status,0)
@@ -158,7 +158,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         inner_join: l1e in L1Execute,
         on: l1e.event_id == l2e.event_id,
         inner_join: c in Checkpoint,
-        on: l1e.checkpoint_hash == c.hash,
+        on: c.start_block_number >= l2e.block_number and c.end_block_number <= l2e.block_number,
         select: %{
           event_id: l2e.event_id,
           from: l2e.from,
@@ -167,7 +167,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
           block_timestamp: l2e.block_timestamp,
           start_block_number: coalesce(c.start_block_number, 0),
           end_block_number: coalesce(c.end_block_number, 0),
-          checkpoint_hash: l1e.checkpoint_hash,
+          checkpoint_hash: c.hash,
           state_root: c.state_root,
           l1_exec_hash: l1e.hash,
           replay_status: coalesce(l1e.replay_status,0)
@@ -219,16 +219,28 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
   def withdrawals_batches(options \\ []) do
     paging_options = Keyword.get(options, :paging_options, default_paging_options())
 
+    count_subquery =
+      from(
+        l2c in Checkpoint,
+        left_join: le2 in L2Event,
+        on: l2e.block_number >= l2c.start_block_number and l2e.block_number <= l2c.end_block_number,
+        group_by: l2c.epoch,
+        select: %{epoch: c.epoch, event_counts: coalesce(count(l2e.event_id),0)}
+      )
+
     base_query =
       from(
         c in Checkpoint,
+        right_join: event_cnt in subquery(count_subquery),
+        on: event_cnt.epoch = c.epoch,
+
         select: %{
           epoch: c.epoch,
           l1_state_batches_hash: c.hash,
           block_number: c.block_number,
           block_timestamp: c.block_timestamp,
           state_root: c.state_root,
-          l2_txns: c.event_counts,
+          l2_txns: event_cnt.event_counts,
           from: c.from,
           tx_fee: c.tx_fee
         },
