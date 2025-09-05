@@ -105,7 +105,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
       # 查询event_id所属的交易事件在l2的区块号
       # 2025/09/05 不用去查询l2的信息，而是在页面展示时再去用SQL查询
       # {l2_blockNumber, l2_tx_type, l2_amount} = get_l2_block_number_by_event_id(event_id)
-      Logger.debug("prepare_events for l1_execute, l2_blockNumber: #{inspect(l2_blockNumber)}")
+      #Logger.debug("prepare_events for l1_execute, l2_blockNumber: #{inspect(l2_blockNumber)}")
 
       # 根据区块号去查寻对应的checkpoint交易的交易hash
       # 2025/09/05 不用去查询l2的信息，而是在页面展示时再去用SQL查询
