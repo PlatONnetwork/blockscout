@@ -6,9 +6,9 @@ defmodule Explorer.Chain.PlatonAppchain.L1Execute do
     Block
     }
 
-  @optional_attrs ~w(amount replay_status)a
+  @optional_attrs ~w(replay_status)a
 
-  @required_attrs ~w(event_id hash block_number checkpoint_hash tx_type status)a
+  @required_attrs ~w(event_id hash block_number status)a
 
   @allowed_attrs @optional_attrs ++ @required_attrs
 
