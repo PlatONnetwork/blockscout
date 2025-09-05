@@ -94,8 +94,8 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L1Executes do
       ],
       where:
         fragment(
-          "(EXCLUDED.hash,EXCLUDED.block_number,EXCLUDED.checkpoint_hash,EXCLUDED.replay_status,
-          EXCLUDED.status) IS DISTINCT FROM (?,?,?,?,?)", # 有冲突时只更新这些字段
+          "(EXCLUDED.hash,EXCLUDED.block_number,EXCLUDED.replay_status,
+          EXCLUDED.status) IS DISTINCT FROM (?,?,?,?)", # 有冲突时只更新这些字段
           l.hash,
           l.block_number,
           l.replay_status,
