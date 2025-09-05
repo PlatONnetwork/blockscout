@@ -301,6 +301,9 @@ defmodule BlockScoutWeb.Notifier do
     Logger.info("broadcast_l2_to_l1_txn  event #{inspect(event)}")
 
     l2_to_l1_txn =  Query.get_l2_to_l1_txn_by_hash(event.hash)
+
+    Logger.info("broadcast_l2_to_l1_txn  l2_to_l1_txn #{inspect(l2_to_l1_txn)}")
+
     if Map.size(l2_to_l1_txn) > 0 do
       Endpoint.broadcast("platon_appchain:l2_to_l1_txn", "l2_to_l1_txn",%{
         "no" => l2_to_l1_txn.event_id,
