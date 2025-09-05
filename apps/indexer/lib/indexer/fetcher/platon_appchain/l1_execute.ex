@@ -100,7 +100,6 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
       replay_status = quantity_to_integer(Enum.at(event["topics"], 2)) #quantity_to_integer 16进制字符串转成integer
       blockNumber = event["blockNumber"]
 
-
       Logger.debug("prepare_events for l1_execute, event_id: #{inspect(event_id)}, replay_status: #{inspect(replay_status)}")
 
       # 查询event_id所属的交易事件在l2的区块号
@@ -111,9 +110,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Execute do
       # 根据区块号去查寻对应的checkpoint交易的交易hash
       # 2025/09/05 不用去查询l2的信息，而是在页面展示时再去用SQL查询
       # {checkpoint_hash} = get_checkpoint_hash_by_block_number(l2_blockNumber)
+
       %{
         event_id: event_id,
-        block_number:  quantity_to_integer(event["blockNumber"])
+        block_number: quantity_to_integer(event["blockNumber"]),
         hash: event["transactionHash"],
         replay_status: replay_status,
         status: 1
