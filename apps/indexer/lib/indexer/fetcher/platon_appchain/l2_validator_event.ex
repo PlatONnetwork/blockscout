@@ -34,9 +34,16 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
   @l2_biz_event_Slashed "0xd2f2b50d0c108d01a95cfb6ee87668e30a20c08be7facf9f28146548f82a8ab7"
   @l2_biz_event_UpdateValidatorStatus "0x85ff997a3e90354ca8883205ac49293eed56e342aa01c0223bd70027118943c2"
 
-  @l2_biz_event_StakeWithdrawalRegistered "0x53fd52fe077bc27429744caa52a6d5476c5608a0c3c99bec17b770d3705dc7d0"
+  #用户发起解质押交易后，合约内部把token转入某地，触发此事件。事件的起因还是用户发起解质押交易（即UnStaked事件。因此只需监控UnStaked事件
+  # @l2_biz_event_StakeWithdrawalRegistered "0x53fd52fe077bc27429744caa52a6d5476c5608a0c3c99bec17b770d3705dc7d0"
+
+  #解质押操作后，用户又发起的提取解除的质押的金额。这是另一个取钱的交易。
   @l2_biz_event_StakeWithdrawal "0xf0ed97f7b968f9d8268bc8d104a11b3586ceeadd0e0af5f73769e2b479f9d0ae"
-  @l2_biz_event_DelegateWithdrawalRegistered "0xaf7d40b00b0df8607eafd5bfbe9a61372370c29c3a1d2004a917c52b0c14099c"
+
+  #用户发起解委托交易后，合约内部把token转入某地，触发此事件。事件的起因还是用户发起解委托交易（即UnDelegated事件。因此只需监控UnDelegated事件
+  #@l2_biz_event_DelegateWithdrawalRegistered "0xaf7d40b00b0df8607eafd5bfbe9a61372370c29c3a1d2004a917c52b0c14099c"
+
+  #解委托操作后，用户又发起的提取解委托的金额。这是另一个取钱的交易。
   @l2_biz_event_DelegateWithdrawal "0x1fbf88541245ec027637253fd351d7237c1244a04eaa3352ca77e8aaff599a59"
 
   defp get_l2_biz_event_name(first_topic) do
@@ -56,12 +63,12 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
         "Slashed"
       @l2_biz_event_UpdateValidatorStatus ->
         "UpdateValidatorStatus"
-      @l2_biz_event_StakeWithdrawalRegistered ->
-        "StakeWithdrawalRegistered"
+      #@l2_biz_event_StakeWithdrawalRegistered ->
+      #  "StakeWithdrawalRegistered"
       @l2_biz_event_StakeWithdrawal ->
         "StakeWithdrawal"
-      @l2_biz_event_DelegateWithdrawalRegistered ->
-        "DelegateWithdrawalRegistered"
+      #@l2_biz_event_DelegateWithdrawalRegistered ->
+      #  "DelegateWithdrawalRegistered"
       @l2_biz_event_DelegateWithdrawal ->
         "DelegateWithdrawal"
     end
@@ -184,7 +191,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
           PlatonAppchain.decode_hex(data) #其它包里也有decode_hex，所以要PlatonAppchain.
       end
 
-    Logger.debug(fn -> "convert L2 log to l2 validator event: #{get_l2_biz_event_name(first_topic)}" end,logger: :platon_appchain)
+
 
     {:ok, timestamp}  = PlatonAppchain.get_block_timestamp_by_number(l2_block_number, json_rpc_named_arguments, 100_000_000)
     block_number = quantity_to_integer(l2_block_number)
@@ -347,21 +354,21 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
            block_timestamp: timestamp
          }]
 
-       @l2_biz_event_StakeWithdrawalRegistered->
-         [amount] = TypeDecoder.decode_raw(data_bytes, [{:uint, 256}])
-         validator_hash =  Base.decode16!(String.slice(second_topic, -40..-1), case: :mixed)
-         action_type = PlatonAppchain.l2_validator_event_action_type()[:StakeWithdrawalRegistered]
-         [%{
-           log_index: log_index,
-           validator_hash: validator_hash,
-           block_number: block_number,
-           epoch: epoch,
-           hash: l2_transaction_hash,
-           action_type: action_type,
-           action_desc: nil,
-           amount: amount,
-           block_timestamp: timestamp
-         }]
+#       @l2_biz_event_StakeWithdrawalRegistered->
+#         [amount] = TypeDecoder.decode_raw(data_bytes, [{:uint, 256}])
+#         validator_hash =  Base.decode16!(String.slice(second_topic, -40..-1), case: :mixed)
+#         action_type = PlatonAppchain.l2_validator_event_action_type()[:StakeWithdrawalRegistered]
+#         [%{
+#           log_index: log_index,
+#           validator_hash: validator_hash,
+#           block_number: block_number,
+#           epoch: epoch,
+#           hash: l2_transaction_hash,
+#           action_type: action_type,
+#           action_desc: nil,
+#           amount: amount,
+#           block_timestamp: timestamp
+#         }]
 
       @l2_biz_event_StakeWithdrawal->
         [amount] = TypeDecoder.decode_raw(data_bytes, [{:uint, 256}])
@@ -379,23 +386,23 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
           block_timestamp: timestamp
         }]
 
-      @l2_biz_event_DelegateWithdrawalRegistered->
-        [amount] = TypeDecoder.decode_raw(data_bytes, [{:uint, 256}])
-        delegator_hash =  Base.decode16!(String.slice(second_topic, -40..-1), case: :mixed)
-        validator_hash =  Base.decode16!(String.slice(third_topic, -40..-1), case: :mixed)
-        action_type = PlatonAppchain.l2_validator_event_action_type()[:DelegateWithdrawalRegistered]
-        [%{
-          log_index: log_index,
-          validator_hash: validator_hash,
-          delegator_hash: delegator_hash,
-          block_number: block_number,
-          epoch: epoch,
-          hash: l2_transaction_hash,
-          action_type: action_type,
-          action_desc: nil,
-          amount: amount,
-          block_timestamp: timestamp
-        }]
+#      @l2_biz_event_DelegateWithdrawalRegistered->
+#        [amount] = TypeDecoder.decode_raw(data_bytes, [{:uint, 256}])
+#        delegator_hash =  Base.decode16!(String.slice(second_topic, -40..-1), case: :mixed)
+#        validator_hash =  Base.decode16!(String.slice(third_topic, -40..-1), case: :mixed)
+#        action_type = PlatonAppchain.l2_validator_event_action_type()[:DelegateWithdrawalRegistered]
+#        [%{
+#          log_index: log_index,
+#          validator_hash: validator_hash,
+#          delegator_hash: delegator_hash,
+#          block_number: block_number,
+#          epoch: epoch,
+#          hash: l2_transaction_hash,
+#          action_type: action_type,
+#          action_desc: nil,
+#          amount: amount,
+#          block_timestamp: timestamp
+#        }]
 
       @l2_biz_event_DelegateWithdrawal->
         [amount] = TypeDecoder.decode_raw(data_bytes, [{:uint, 256}])
