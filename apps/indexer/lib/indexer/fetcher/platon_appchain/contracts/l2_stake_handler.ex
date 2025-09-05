@@ -92,7 +92,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     Logger.debug(fn -> "getValidators L2 stake contract: #{toAddress}" end,logger: :platon_appchain)
     Logger.error(fn -> "getValidators L2 stake contract: #{toAddress}" end,logger: :platon_appchain)
 
-    result = get_validators(start, size) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = get_validators(start, size) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
 
     Logger.debug(fn -> "getValidators result: #{inspect(result)}" end,logger: :platon_appchain)
     Logger.error(fn -> "getValidators result: #{inspect(result)}" end,logger: :platon_appchain)
@@ -153,7 +153,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   """
   def getValidatorsWithAddr(validator_addresses) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
-    result = get_validators_with_addr(validator_addresses) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = get_validators_with_addr(validator_addresses) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, validators} = result
     validatorsJson = validators |> Enum.map(fn validator -> convertValidatorToJSON(validator) end)
     validatorsJson
@@ -173,7 +173,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec getValidator(binary()) :: map()
   def getValidator(validator_hex) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
-    result = get_validators_with_addr([validator_hex]) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = get_validators_with_addr([validator_hex]) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, validators} = result
     convertValidatorToJSON(List.first(validators))
   end
@@ -197,7 +197,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec getValidatorAddrs(non_neg_integer(), non_neg_integer()) :: {list()}
   def getValidatorAddrs(periodType, period) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorAddrs
-    result = get_validator_addrs(periodType, period) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = get_validator_addrs(periodType, period) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, addrs} = result
     addrs
   end
@@ -217,7 +217,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     #  {"0x70d207c1322ccb9069d3790d6768866dabff1035", 80}
     # ]
 
-    result = get_blocks_of_validators(periodType, period) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = get_blocks_of_validators(periodType, period) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     case result do
       {:ok, blockProducedInfos} -> convertBlockProducedInfos(blockProducedInfos)
       _ -> []
@@ -253,7 +253,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec getDelegationsWithValidator(list(), binary()) :: {list()}
   def getDelegationsWithValidator(validators, delegator) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getDelegationsWithValidator
-    result =  get_delegations_with_validator(validators, delegator) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result =  get_delegations_with_validator(validators, delegator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, delegations} = result
     delegationJson = delegations |> Enum.map(fn delegation -> convertDelegationToJSON(delegation) end)
     delegationJson
@@ -273,7 +273,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec pendingWithdrawalsOfDelegate(binary(), binary()) :: {non_neg_integer()}
   def pendingWithdrawalsOfDelegate(validator, delegator) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，pendingWithdrawalsOfDelegate
-    result = pending_withdrawals_of_delegate(validator, delegator) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = pending_withdrawals_of_delegate(validator, delegator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, pendingWithdrawals} = result
     pendingWithdrawals
   end
@@ -290,7 +290,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec pendingWithdrawalsOfStake(binary()) :: {non_neg_integer()}
   def pendingWithdrawalsOfStake(validator) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，pendingWithdrawalsOfStake
-    result = pending_withdrawals_of_stake(validator) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = pending_withdrawals_of_stake(validator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, pendingWithdrawals} = result
     pendingWithdrawals
   end
@@ -308,7 +308,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec withdrawableOfDelegate(binary(), binary()) :: {non_neg_integer()}
   def withdrawableOfDelegate(validator, delegator) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，withdrawableOfDelegate
-    result = withdrawable_of_delegate(validator, delegator) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = withdrawable_of_delegate(validator, delegator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, withdrawable} = result
     withdrawable
   end
@@ -325,7 +325,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec withdrawableOfStake(String.t()) :: {non_neg_integer()}
   def withdrawableOfStake(validator) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，withdrawableOfStake
-    result = withdrawable_of_stake(validator) |> Ethers.call(to: l2StakeHandlerContract, rpc_opts: rpc_opts())
+    result = withdrawable_of_stake(validator) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, withdrawable} = result
     withdrawable
   end
