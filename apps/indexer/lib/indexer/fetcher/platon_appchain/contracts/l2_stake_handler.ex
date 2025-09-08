@@ -3,7 +3,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   Stake handler contract interface encapsulation
   """
   alias Ethers
+  alias Explorer.Chain.{Hash}
   require Logger
+
+
   # use Ethers.Contract, abi_file: "config/abi/L2_StakeHandler.json", default_address:  System.get_env("INDEXER_PLATON_APPCHAIN_L2_STAKE_HANDLER_CONTRACT")
   use Ethers.Contract, abi_file: "config/abi/L2_StakeHandler.json"
   defp l2StakeHandlerContract() do
