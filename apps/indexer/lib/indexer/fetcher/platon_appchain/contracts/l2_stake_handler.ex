@@ -358,8 +358,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   end
 
   defp getDelegatorDetails(delegator_hash, validator_hash) do
-    delegator_hash_hex = Hash.to_string(event.delegator_hash)
-    validator_hash_hex = Hash.to_string(event.validator_hash)
+    delegator_hash_hex = Hash.to_string(delegator_hash)
+    validator_hash_hex = Hash.to_string(validator_hash)
 
     withdrawal_delegate_amount = withdrawableOfDelegate(validator_hash_hex, delegator_hash_hex)
     locking_delegate_amount = pendingWithdrawalsOfDelegate(validator_hash_hex, delegator_hash_hex)
