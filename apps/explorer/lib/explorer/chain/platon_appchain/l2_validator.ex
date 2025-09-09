@@ -205,11 +205,11 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
 
   defp reset_active_validators(multi, active_validator_hash_list) do
     # 把原记录role=1的记录更新为role=0
-    Ecto.Multi.update_all(multi, :reset_active_validator, from(v in __MODULE__, where: v.role == 1), [role: 0])
+    Ecto.Multi.update_all(multi, :reset_active_validator_step1, from(v in __MODULE__, where: v.role == 1), [role: 0])
 
     # 根据新的201名单，更新记录
     Enum.reduce(active_validator_hash_list, multi, fn validator_hash, multi ->
-      Ecto.Multi.update_all(multi, :reset_active_validator, from(v in __MODULE__, where: v.validator_hash == ^validator_hash), [role: 1])
+      Ecto.Multi.update_all(multi, :reset_active_validator_step2, from(v in __MODULE__, where: v.validator_hash == ^validator_hash), [role: 1])
     end)
   end
 
