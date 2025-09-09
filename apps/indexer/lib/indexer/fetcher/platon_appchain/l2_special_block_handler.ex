@@ -30,7 +30,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
 
     epoch_begin_blocks = Enum.filter(blocks, fn block -> PlatonAppchain.is_epoch_begin_block(block.number) == true end)
 
+    Logger.info("inspect_special_block, epoch_begin_blocks: #{inspect(epoch_begin_blocks)}")
+
     if Enum.empty?(epoch_begin_blocks) == false do
+      # Enum.take(list(), -1)，表示取倒数第一个值
       max_epoch_begin_block = Enum.take(epoch_begin_blocks, -1)
 
       L2ValidatorService.reset_active_validators(max_epoch_begin_block)
