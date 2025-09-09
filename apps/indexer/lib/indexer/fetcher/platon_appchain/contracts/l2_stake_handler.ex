@@ -275,10 +275,6 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   end
 
 
-  def merge_by_key(list, key_to_sum) do
-
-  end
-
   @doc """
   Query how much is yet to become withdrawable for account.
 
