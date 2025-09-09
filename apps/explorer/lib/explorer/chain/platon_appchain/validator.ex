@@ -181,7 +181,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
           delegate_amount: l.delegate_amount,
           delegator_hash: l.delegator_hash
         },
-        where: l.delegate_amount > %Wei{value: 0}
+        where: l.delegate_amount > %Wei{value: Decimal.new(0)}
       )
 
     base_query
