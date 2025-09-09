@@ -41,7 +41,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
 
       # 结算周期结束，会重新选举201名单
       # 添加成功通过ws给前端发消息 begin，以便前端更新验证人列表
-      Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator", 1)
+      # Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator", 1)
       # 添加成功通过ws给前端发消息 end
     end
 
