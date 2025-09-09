@@ -142,7 +142,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
     L2Validator.reset_active_validators(active_validator_list)
 
     # 添加成功通过ws给前端发消息 begin
-    Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator", 1)
+    # Endpoint.broadcast("platon_appchain_l2_validator:all_validator", "all_validator", 1)
     # 添加成功通过ws给前端发消息 end
     {:ok, "add new validator(s) successfully"}
   end
