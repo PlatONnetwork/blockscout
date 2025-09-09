@@ -33,8 +33,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2SpecialBlockHandler do
     Logger.info("inspect_special_block, blocks: #{inspect(blocks)}, epoch_begin_blocks: #{inspect(epoch_begin_blocks)}")
 
     if Enum.empty?(epoch_begin_blocks) == false do
-      # Enum.take(list(), -1)，表示取倒数第一个值
-      max_epoch_begin_block = Enum.take(epoch_begin_blocks, -1)
+      # Enum.take(list(), -1)，表示取倒数第一个值, 返回的也还是个list
+      [max_epoch_begin_block] = Enum.take(epoch_begin_blocks, -1)
+
 
       L2ValidatorService.reset_active_validators(max_epoch_begin_block)
 
