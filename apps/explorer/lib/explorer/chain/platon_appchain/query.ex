@@ -39,7 +39,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         select: %{
           event_id: l12.event_id,
           l1_event_hash: l12.l1e_hash,
-          l1_block_nubmer: l12.l1e_block_number,
+          l1_block_number: l12.l1e_block_number,
           tx_type: l12.tx_type,
           block_timestamp: l12.l1e_block_timestamp,
           l2_event_hash: l12.l2e_hash,
