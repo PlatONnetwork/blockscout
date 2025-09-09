@@ -7,7 +7,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
 
   alias Explorer.{PagingOptions, Repo}
   alias Explorer.Chain.PlatonAppchain.{L2Validator,L2ValidatorEvent,L2Delegator}
-  alias Explorer.Chain.{Block,Address,Hash,Transaction}
+  alias Explorer.Chain.{Block,Address,Hash,Transaction,Wei}
 
   @typedoc """
    * `:optional` - the association is optional and only needs to be loaded if available
@@ -181,7 +181,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
           delegate_amount: l.delegate_amount,
           delegator_hash: l.delegator_hash
         },
-        where: l.delegate_amount > 0
+        where: l.delegate_amount > %Wei{value: 0}
       )
 
     base_query
