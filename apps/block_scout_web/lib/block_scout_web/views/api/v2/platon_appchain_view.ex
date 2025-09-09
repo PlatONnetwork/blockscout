@@ -12,6 +12,7 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
           %{
             "no" => commitments.event_id,
             "l1_txn_hash" => commitments.l1_event_hash,
+            "l1_block_number" => commitments.l1_block_number,
             "tx_type" => commitments.tx_type,
             "block_timestamp" => commitments.block_timestamp,
             "state_batches_index" => Integer.to_string(commitments.start_id) <> "-"  <> Integer.to_string(commitments.end_id),
