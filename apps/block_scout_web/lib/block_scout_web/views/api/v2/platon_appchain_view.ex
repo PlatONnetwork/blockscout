@@ -57,8 +57,6 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
           %{
             "no" => withdrawal.event_id,
             "epoch" => withdrawal.epoch,
-            "start_block_number" => withdrawal.start_block_number,
-            "end_block_number" => withdrawal.end_block_number,
             "from" => withdrawal.from,
             "l2_txn_hash" => withdrawal.l2_event_hash,
             "type" => withdrawal.tx_type,
@@ -83,6 +81,8 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
         Enum.map(withdrawals, fn withdrawal ->
          %{
            "no" => withdrawal.epoch,
+           "start_block_number" => withdrawal.start_block_number,
+           "end_block_number" => withdrawal.end_block_number,
            "l1_state_batches_hash" => withdrawal.l1_state_batches_hash,
            "l1_block" => withdrawal.block_number,
            "block_timestamp" => withdrawal.block_timestamp,

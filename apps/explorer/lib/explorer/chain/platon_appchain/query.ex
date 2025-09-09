@@ -237,6 +237,8 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
 
         select: %{
           epoch: c.epoch,
+          start_block_number: c.start_block_number,
+          end_block_number: c.end_block_number,
           l1_state_batches_hash: c.hash,
           block_number: c.block_number,
           block_timestamp: c.block_timestamp,
