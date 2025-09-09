@@ -180,7 +180,8 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
         select: %{
           delegate_amount: l.delegate_amount,
           delegator_hash: l.delegator_hash
-        }
+        },
+        where: l.delegate_amount > 0
       )
 
     base_query
