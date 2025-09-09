@@ -28,7 +28,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         l1e in L1Event,
         left_join: l2e in L2Execute,
         on: l1e.event_id == l2e.event_id,
-        select: %{event_id: l1e.event_id, l1e_block_number: l1e.block_number, l1e_hash: l1e.hash,tx_type: l1e.tx_type,l1e_block_timestamp: l1e.block_timestamp,l2e_hash: l2e.hash,replay_status: l2e.replay_status}
+        select: %{event_id: l1e.event_id, l1e_block_number: l1e.block_number, l1e_hash: l1e.hash, l1e_amount: l1e.amount, tx_type: l1e.tx_type,l1e_block_timestamp: l1e.block_timestamp,l2e_hash: l2e.hash,replay_status: l2e.replay_status}
       )
 
     base_query =
@@ -39,6 +39,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         select: %{
           event_id: l12.event_id,
           l1_event_hash: l12.l1e_hash,
+          l1_amount: l12.l1e_amount,
           l1_block_number: l12.l1e_block_number,
           tx_type: l12.tx_type,
           block_timestamp: l12.l1e_block_timestamp,
@@ -133,6 +134,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
           event_id: l2e.event_id,
           from: l2e.from,
           l2_event_hash: l2e.hash,
+          l2_amount: l2e.amount,
           tx_type: l2e.tx_type,
           block_timestamp: l2e.block_timestamp,
           epoch: coalesce(c.epoch, 0),
