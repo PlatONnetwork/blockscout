@@ -215,11 +215,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
   # epoch_size = 430 * 25 = 10750
   # 结算周期开始块：round_size * n + 1
   def is_epoch_begin_block(block_number) do
-    if rem(block_number,l2_epoch_size()) == 1 do
-      {true, calculateL2Epoch(block_number)}
-    else
-      {false, calculateL2Epoch(block_number)}
-    end
+    rem(block_number,l2_epoch_size()) == 1
   end
 
   def is_epoch_end_block(block_number) do
