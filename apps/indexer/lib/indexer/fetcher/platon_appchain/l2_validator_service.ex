@@ -134,7 +134,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
 
   def reset_active_validators(epoch_begin_block) do
-    epoch = PlatonAppchain.calculateL2Epoch(epoch_begin_block)
+    epoch = PlatonAppchain.calculateL2Epoch(epoch_begin_block.number)
     active_validator_list = L2StakeHandler.getValidatorAddrs(2, epoch) # 每个结算周期末，得到201大名单（共识节点候选节点）
 
     Logger.info("reset active validators: epoch: #{epoch}, validators: #{inspect(active_validator_list)}")
