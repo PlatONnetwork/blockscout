@@ -6,7 +6,7 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
   import Explorer.Chain, only: [default_paging_options: 0, select_repo: 1]
 
   alias Explorer.{PagingOptions, Repo}
-  alias Explorer.Chain.PlatonAppchain.{L2Validator,L2ValidatorEvent}
+  alias Explorer.Chain.PlatonAppchain.{L2Validator,L2ValidatorEvent,L2Delegator}
   alias Explorer.Chain.{Block,Address,Hash,Transaction}
 
   @typedoc """
