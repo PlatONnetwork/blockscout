@@ -209,7 +209,8 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
 
     # 根据新的201名单，更新记录
     Enum.reduce(active_validator_hash_list, multi, fn validator_hash, multi ->
-      Ecto.Multi.update_all(multi, {:reset_active_validator_step2, validator_hash}, from(v in __MODULE__, where: v.validator_hash == ^validator_hash), [role: 1])
+      Ecto.Multi.update_all(multi, {:reset_active_validator_step2, validator_hash}, from(v in __MODULE__, where: v.validator_hash == ^validator_hash),
+        [set: [role: 1]])
     end)
   end
 
