@@ -74,7 +74,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Delegator do
   # 修改已提取的委托奖励, 如果increment就是负数，就是减少委托
   def update_delegations(l2_delegator_data_maps) do
     Enum.each(l2_delegator_data_maps, fn dataset ->
-      update_changeset(dataset)
+      changeset(%__MODULE__{}, dataset)
       |> Repo.insert(
            on_conflict: {:replace, [:delegate_amount, :locking_delegate_amount, :withdrawal_delegate_amount, :updated_at]},
            conflict_target: [:delegator_hash, :validator_hash],
