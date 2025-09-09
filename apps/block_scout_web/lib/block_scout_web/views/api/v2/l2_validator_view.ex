@@ -167,7 +167,7 @@ defmodule BlockScoutWeb.API.V2.L2ValidatorView do
         Enum.map(delegators, fn delegator ->
          %{
            "delegator_address" => delegator.delegator_hash,
-           "amount" => delegator.amount,
+           "amount" => delegator.delegate_amount,
            "percentage" => "待处理"
          }
         end),

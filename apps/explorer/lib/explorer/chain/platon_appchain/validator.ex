@@ -170,19 +170,17 @@ defmodule Explorer.Chain.PlatonAppchain.Validator do
     |> select_repo(options).all()
   end
 
-  @spec get_delegator([]) :: [L2ValidatorEvent.t()]
+  @spec get_delegator([]) :: [L2Delegator.t()]
   def get_delegator(options \\ []) when is_list(options) do
     paging_options = Keyword.get(options, :paging_options, default_paging_options())
 
     base_query =
       from(
-        l in L2ValidatorEvent,
+        l in L2Delegator,
         select: %{
-          amount: l.amount,
+          delegate_amount: l.delegate_amount,
           delegator_hash: l.delegator_hash
-        },
-        where: l.action_type == 3,
-        order_by: [desc: l.block_number]
+        }
       )
 
     base_query
