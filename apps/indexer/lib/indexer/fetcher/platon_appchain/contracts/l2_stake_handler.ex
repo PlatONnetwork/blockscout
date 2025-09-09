@@ -259,8 +259,24 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getDelegationsWithValidator
     result =  get_delegations_with_validator(validators_hex, delegator_hex) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: rpc_opts())
     {:ok, delegations} = result
+
+
     delegationJson = delegations |> Enum.map(fn delegation -> convertDelegationToJSON(delegation) end)
-    delegationJson
+
+    #求总的委托金额
+    totalDelegations = Enum.reduce(delegationJson, 0, fn item, acc -> acc + item.delegate_amount end)
+
+    %{
+      validator_hash: validators_hex,
+      delegator_hash:  delegator_hex,
+      delegate_amount: totalDelegations
+    }
+
+  end
+
+
+  def merge_by_key(list, key_to_sum) do
+
   end
 
   @doc """
