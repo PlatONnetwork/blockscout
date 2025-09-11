@@ -72,6 +72,7 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainController do
 
       {:error, :not_found} = res ->
         res
+    end
   end
 
   @spec deposits_batches_count(Plug.Conn.t(), map()) :: Plug.Conn.t()
