@@ -132,6 +132,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
     |> case do
          nil -> {:error, :not_found}
          withdrawals_batches_details -> {:ok, withdrawals_batches_details}
+    end
   end
 
 
