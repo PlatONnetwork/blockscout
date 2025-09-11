@@ -128,7 +128,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
           tx_fee: c.tx_fee
         }
       )
-    Repo.replica().one(query)
+    Repo.replica().one(base_query)
   end
 
 
