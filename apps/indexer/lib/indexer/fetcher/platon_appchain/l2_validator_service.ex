@@ -34,7 +34,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
         true -> %{}
       end
     Map.merge(validatorInfoMap, exit_info)
-    L2Validator.update_validator(repo, validatorInfoMap)
+    #L2Validator.update_validator(repo, validatorInfoMap)
+    #有记录就更新，没有就insert
+    L2Validator.upsert_validator(repo, validatorInfoMap)
   end
 
   @spec increase_stake(binary(), integer()) :: {:ok, L2Validator.t()} | {:error, reason :: String.t()}

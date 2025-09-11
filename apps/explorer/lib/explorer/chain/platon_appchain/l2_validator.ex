@@ -123,6 +123,7 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
 
   @spec update_validator(Ecto.Repo.t(), map()) :: {:ok, Ecto.Schema.t()} | {:error, reason :: String.t()}
   def update_validator(repo, dataMap) do
+    # repo.get_by(__MODULE__, validator_hash: dataMap.validator_hash),在清理数据，重新同步区块时，不一定按顺序同步区块，所以，此时不应能查询到validator, 会造成|> changeset(dataMap)异常
     repo.get_by(__MODULE__, validator_hash: dataMap.validator_hash)
     |> changeset(dataMap)
     |> repo.update()
