@@ -110,7 +110,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
 
 
 
-  @spec get_withdrawals_batches_details() :: map() |nil
+  @spec get_withdrawals_batches_details(non_neg_integer()) :: {:ok, map()} | {:error, :not_found}
   def get_withdrawals_batches_details(epoch) do
     base_query =
       from(
@@ -129,6 +129,9 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         }
       )
     Repo.replica().one(base_query)
+    |> case do
+         nil -> {:error, :not_found}
+         withdrawals_batches_details -> {:ok, withdrawals_batches_details}
   end
 
 

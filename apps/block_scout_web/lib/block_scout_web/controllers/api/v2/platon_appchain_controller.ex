@@ -64,10 +64,14 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainController do
 
   @spec withdrawals_batches_details(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def withdrawals_batches_details(conn, %{"epoch" => epoch} = _params) do
-    withdrawals_batches_details =  Query.get_withdrawals_batches_details(epoch)
-    conn
-    |> put_status(200)
-    |> render(:platon_appchain_withdrawals_batches_details, %{withdrawals_batches_details: withdrawals_batches_details})
+    case Query.get_withdrawals_batches_details(epoch) do
+      {:ok, withdrawals_batches_details} ->
+        conn
+        |> put_status(200)
+        |> render(:platon_appchain_withdrawals_batches_details, %{withdrawals_batches_details: withdrawals_batches_details})
+
+      {:error, :not_found} = res ->
+        res
   end
 
   @spec deposits_batches_count(Plug.Conn.t(), map()) :: Plug.Conn.t()
