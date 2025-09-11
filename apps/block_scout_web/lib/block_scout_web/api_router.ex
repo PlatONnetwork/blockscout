@@ -343,6 +343,7 @@ defmodule BlockScoutWeb.ApiRouter do
         get("/withdrawals-batches", V2.PlatonAppchainController, :withdrawals_batches)
         get("/withdrawals-batches/count", V2.PlatonAppchainController, :withdrawals_batches_count)
         get("/withdrawals/batches-tx", V2.PlatonAppchainController, :withdrawals_batches_tx)
+        get("/withdrawals/batches/:epoch", V2.PlatonAppchainController, :withdrawals_batches_details)
       end
     end
 

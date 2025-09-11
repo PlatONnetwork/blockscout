@@ -107,6 +107,31 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
     |> select_repo(options).all()
   end
 
+
+
+
+  @spec get_withdrawals_batches_details() :: map() |nil
+  def get_withdrawals_batches_details(epoch) do
+    base_query =
+      from(
+        c in Checkpoint,
+        where: c.epoch == ^epoch,
+        select: %{
+          epoch: c.epoch,
+          start_block_nubmer: c.start_block_number,
+          end_block_nubmer: c.end_block_number,
+          state_root: c.state_root,
+          block_number: c.block_number,
+          hash: c.hash,
+          block_timestamp: c.block_timestamp,
+          from: c.from,
+          tx_fee: c.tx_fee
+        }
+      )
+    Repo.replica().one(query)
+  end
+
+
   @spec deposits_batches_count(list()) :: term() | nil
   def deposits_batches_count(options \\ []) do
     query =
@@ -285,7 +310,7 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
           hash: l2e.hash,
           type: t.type,
           block_number: l2e.block_number,
-          input: t.input,
+          method: l2e.tx_type,
           from: l2e.from,
           to: l2e.to,
           value: t.value,

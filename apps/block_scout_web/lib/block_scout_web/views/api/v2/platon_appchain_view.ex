@@ -100,6 +100,22 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
     }
   end
 
+  def render("platon_appchain_withdrawals_batches_details.json", %{withdrawals_batches_details: withdrawals_batches_details}) do
+    %{
+      items:
+      %{
+        "epoch" => withdrawals_batches_details.epoch,
+        "start_block_nubmer" => withdrawals_batches_details.start_block_nubmer,
+        "end_block_nubmer" => withdrawals_batches_details.end_block_nubmer,
+        "state_root" => withdrawals_batches_details.state_root,
+        "block_number" => withdrawals_batches_details.block_number,
+        "hash" => withdrawals_batches_details.hash,
+        "block_timestamp" => withdrawals_batches_details.block_timestamp,
+        "from" => withdrawals_batches_details.from,
+        "tx_fee" => withdrawals_batches_details.tx_fee
+      }
+    }
+  end
 
   def render("platon_appchain_withdrawals_batches_tx.json", %{
     withdrawals: withdrawals,
@@ -109,9 +125,9 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
       items:
         Enum.map(withdrawals, fn withdrawal ->
           %{
-            "txn_hash" => withdrawal.hash,
+            "hash" => withdrawal.hash,
             "type" => withdrawal.type,
-            "method" =>  withdrawal.input,# 待转换
+            "method" =>  withdrawal.method,# 待转换 就是l2Event.tx_type
             "block" => withdrawal.block_number,
             "from" => withdrawal.from,
             "to" => withdrawal.to,
