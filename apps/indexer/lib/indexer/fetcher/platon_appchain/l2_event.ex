@@ -150,6 +150,12 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
 
     sig = binary_part(data_bytes, 0, 32)
 
+    # 不再有用，这里需要记录的是交易的 tx_type / from / to / amount，
+    # 而不是合约业务里逻辑上的tx_type / from / to / amount。逻辑上的tx_type / from / to / amount，前端可以点击合约事件的详情
+    # 目前 amount 还有用， 有页面需要展示
+    # 目前 tx_type 还有用， 有页面需要展示。 Transaction.type有何区别？tx_type是否可以完全去掉？
+    # 在 apps/explorer/lib/explorer/chain/platon_appchain/query.ex#withdrawals_batches_tx的查询方法里，from / to 用Transaction的from_address_hash / to_address_hash代替
+
     {:ok, l2_block_timestamp} = PlatonAppchain.get_block_timestamp_by_number(l2_block_number, json_rpc_named_arguments, 100_000_000)
     case Base.encode16(sig, case: :lower) do
       @withdraw_signature ->
@@ -158,8 +164,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
         %{
           event_id: eventID,
           tx_type: PlatonAppchain.l2_events_tx_type()[:withdraw],
-          from: withdrawer,
-          to: recipient,
+          from: withdrawer,  # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
+          to: recipient,  # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
           amount: amount,
           hash: l2_transaction_hash,
           block_number: quantity_to_integer(l2_block_number),
@@ -172,8 +178,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
         %{
           event_id: eventID,
           tx_type: PlatonAppchain.l2_events_tx_type()[:stakeWithdraw],
-          from: validatorAddr,
-          to: "",
+          from: validatorAddr,  # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
+          to: "",  # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
           amount: amount,
           hash: l2_transaction_hash,
           block_number: quantity_to_integer(l2_block_number),
@@ -186,8 +192,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
         %{
           event_id: eventID,
           tx_type: PlatonAppchain.l2_events_tx_type()[:degationWithdraw],
-          from: delegatorAddr,
-          to: validatorAddr,
+          from: delegatorAddr,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
+          to: validatorAddr,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
           amount: amount,
           hash: l2_transaction_hash,
           block_number: quantity_to_integer(l2_block_number),
@@ -201,8 +207,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
         %{
           event_id: eventID,
           tx_type: PlatonAppchain.l2_events_tx_type()[:slash],
-          from: first,
-          to: first,
+          from: first,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
+          to: first,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
           amount: slashingPercent,
           hash: l2_transaction_hash,
           block_number: quantity_to_integer(l2_block_number),

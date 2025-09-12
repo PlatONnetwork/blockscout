@@ -305,6 +305,11 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
     paging_options = Keyword.get(options, :paging_options, default_paging_options())
     %PagingOptions{key: {start_block_number, end_block_number}} = paging_options
 
+    # 不再有用，这里需要记录的是交易的 tx_type / from / to / amount，
+    # 而不是合约业务里逻辑上的tx_type / from / to / amount。逻辑上的tx_type / from / to / amount，前端可以点击合约事件的详情
+    # 目前 amount 还有用， 有页面需要展示
+    # 目前 tx_type 还有用， 有页面需要展示。 Transaction.type有何区别？tx_type是否可以完全去掉？
+
     base_query =
       from(
         l2e in L2Event,
@@ -315,8 +320,8 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
           type: t.type,
           block_number: l2e.block_number,
           method: l2e.tx_type,
-          from: l2e.from,
-          to: l2e.to,
+          from: t.from_address_hash,
+          to: t.to_address_hash,
           value: t.value,
           fee: t.gas_price*t.gas_used
         },
