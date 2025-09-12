@@ -118,8 +118,8 @@ defmodule Explorer.Chain.PlatonAppchain.Query do
         where: c.epoch == ^epoch,
         select: %{
           epoch: c.epoch,
-          start_block_nubmer: c.start_block_number,
-          end_block_nubmer: c.end_block_number,
+          start_block_number: c.start_block_number,
+          end_block_number: c.end_block_number,
           state_root: c.state_root,
           block_number: c.block_number,
           hash: c.hash,
