@@ -105,8 +105,8 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
       items:
       %{
         "epoch" => withdrawals_batches_details.epoch,
-        "start_block_nubmer" => withdrawals_batches_details.start_block_nubmer,
-        "end_block_nubmer" => withdrawals_batches_details.end_block_nubmer,
+        "start_block_number" => withdrawals_batches_details.start_block_number,
+        "end_block_number" => withdrawals_batches_details.end_block_number,
         "state_root" => withdrawals_batches_details.state_root,
         "block_number" => withdrawals_batches_details.block_number,
         "hash" => withdrawals_batches_details.hash,
