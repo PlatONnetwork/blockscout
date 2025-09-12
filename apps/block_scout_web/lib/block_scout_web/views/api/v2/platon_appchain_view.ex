@@ -129,8 +129,8 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
             "type" => withdrawal.type,
             "method" =>  withdrawal.method,# 待转换 就是l2Event.tx_type
             "block" => withdrawal.block_number,
-            "from" => withdrawal.from,
-            "to" => withdrawal.to,
+            "from" => %{"hash" => withdrawal.from},
+            "to" => %{"hash" => withdrawal.to},
             "value" => withdrawal.value,
             "fee" => %{"type" => "actual", "value" => withdrawal.fee},
           }
