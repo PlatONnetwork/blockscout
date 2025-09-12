@@ -132,7 +132,7 @@ defmodule BlockScoutWeb.API.V2.PlatonAppchainView do
             "from" => withdrawal.from,
             "to" => withdrawal.to,
             "value" => withdrawal.value,
-            "fee" => withdrawal.fee
+            "fee" => %{"type" => "actual", "value" => withdrawal.fee},
           }
         end),
       next_page_params: next_page_params
