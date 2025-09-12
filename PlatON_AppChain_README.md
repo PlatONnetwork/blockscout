@@ -110,4 +110,6 @@ export DISABLE_EXCHANGE_RATES=false
 export INDEXER_PLATON_APPCHAIN_L1_TOKEN_CONTRACT
 ```
 
-
+## 数据初始化
+后端部署完成后，
+需要手工执行：config/smart_contracts_202509121755.sql
