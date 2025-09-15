@@ -308,7 +308,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorEvent do
          action_type = PlatonAppchain.l2_validator_event_action_type()[:Slashed]
 
          [validator_hashes, amounts] = TypeDecoder.decode_raw(data_bytes, [{:array, :address}, {:array, {:uint, 256}}])
-         Logger.debug(fn -> "convert Slashed log.data: validator_hashes: #{validator_hashes}, amounts: #{amounts}" end,logger: :platon_appchain)
+         # Logger.debug(fn -> "convert Slashed log.data: validator_hashes: #{inspect(validator_hashes)}, amounts: #{inspect(amounts)}" end,logger: :platon_appchain)
 
          if length(validator_hashes) != length(amounts) do
            Logger.error(fn -> "l2 validator slash event data error, validators not match to amounts" end , logger: :platon_appchain)
