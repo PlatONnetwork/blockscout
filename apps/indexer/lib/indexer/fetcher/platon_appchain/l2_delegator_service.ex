@@ -82,6 +82,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2DelegatorService do
       Enum.reduce(total_delegator_events, MapSet.new(), fn event, acc -> MapSet.put(acc, %{validator_hash: event.validator_hash, delegator_hash: event.delegator_hash}) end)
     end
     # validator_hash / delegator_hash，是 bytea类型
+
+    Logger.info("unique_delegator_validator: #{inspect(unique_delegator_validator)}")
+
     if Enum.empty?(unique_delegator_validator) == false do
       L2Delegator.update_delegations(L2StakeHandler.getDelegateDetails(unique_delegator_validator))
     end

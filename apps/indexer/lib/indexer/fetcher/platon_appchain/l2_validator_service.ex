@@ -20,6 +20,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
   @spec update_validator_by_event(Repo.t(), map()) :: {:ok, integer()} | {:error, reason :: String.t()}
   def update_validator_by_event(repo, event) do
+    Logger.info("update_validator_by_event: #{inspect(event)}")
+
     validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number)
 
     lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())

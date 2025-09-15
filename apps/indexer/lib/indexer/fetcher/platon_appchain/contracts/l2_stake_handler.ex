@@ -179,7 +179,14 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
     result = get_validators_with_addr([validator_hex]) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: [block: block_number] ++ rpc_opts())
     {:ok, validators} = result
-    convertValidatorToJSON(List.first(validators))
+
+    Logger.info("getValidator result: #{inspect(validators)}")
+    if length(validators) > 0 do
+      convertValidatorToJSON(List.first(validators))
+    else
+      %{}
+    end
+
   end
 
 
@@ -370,6 +377,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   end
 
   defp getDelegatorDetails(delegator_hash, validator_hash) do
+    Logger.info("getDelegatorDetails, delegator_hash: #{delegator_hash}")
+    Logger.info("getDelegatorDetails, validator_hash: #{validator_hash}")
     delegator_hash_hex = Hash.to_string(delegator_hash)
     validator_hash_hex = Hash.to_string(validator_hash)
 
