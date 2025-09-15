@@ -11,16 +11,16 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
   alias Indexer.Fetcher.PlatonAppchain
 
 
-  @spec upsert_validator(Repo.t(), binary()) :: {:ok, integer()} | {:error, reason :: String.t()}
-  def upsert_validator(repo, validator_hex) do
+  @spec upsert_validator(Repo.t(), binary(), non_neg_integer) :: {:ok, integer()} | {:error, reason :: String.t()}
+  def upsert_validator(repo, validator_hex, block_number) do
     # 去合约查询验证人信息，并upsert到l2_validators表
-    validatorMap = L2StakeHandler.getValidator(validator_hex)
+    validatorMap = L2StakeHandler.getValidator(validator_hex, block_number)
     L2Validator.upsert_validator(repo, validatorMap)
   end
 
   @spec update_validator_by_event(Repo.t(), map()) :: {:ok, integer()} | {:error, reason :: String.t()}
   def update_validator_by_event(repo, event) do
-    validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash))
+    validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number)
 
     lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())
 

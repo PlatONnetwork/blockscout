@@ -127,13 +127,15 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
   end
 
   defp register_validator(repo, l2_new_validator_events, %{timeout: timeout, timestamps: timestamps})  do
-    registered_validator_hash_list =
-      l2_new_validator_events
-    |> Enum.reduce([], fn validator_event, acc ->  [validator_event.validator_hash | acc] end)
-    |> Enum.uniq() # 去重
+#    registered_validator_hash_list =
+#      l2_new_validator_events
+#    |> Enum.reduce([], fn validator_event, acc ->  [validator_event.validator_hash | acc] end)
+#    |> Enum.uniq() # 去重
+# 不考虑去重
+
     # 需要用upsert的模式（insert/update）新增表数据， l2_validators.status是个复合状态
-    Enum.each(registered_validator_hash_list, fn validator_hash ->
-      case L2ValidatorService.upsert_validator(repo, Hash.to_string(validator_hash)) do
+    Enum.each(l2_new_validator_events, fn validator_event ->
+      case L2ValidatorService.upsert_validator(repo, Hash.to_string(validator_event.validator_hash), validator_event.block_number) do
         {:ok, _result} -> :ok
         {:error, _reason} -> throw({:error, "add new validator(s) failed"})
       end
