@@ -29,7 +29,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2DelegatorService do
   @spec refreshed_delegators(list(), Range.t()) :: list()
   def refreshed_delegators(l2_validator_events, block_first..block_last) do
     l2_delegator_events =
-      if Enum.empty?(l2_validator_events) == false do
+      if Enum.empty?(l2_validator_events) == true do
         []
       else
         l2_validator_events
