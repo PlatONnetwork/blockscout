@@ -81,7 +81,8 @@ defmodule Explorer.Chain.PlatonAppchain.L2ValidatorEvent do
           delegator_hash: v.delegator_hash,
           inserted_at: v.inserted_at,
           updated_at: v.updated_at},
-        where: v.epoch >= ^epoch_start and v.epoch<= ^epoch_end
+        where: v.epoch >= ^epoch_start and v.epoch<= ^epoch_end and v.action_type == 5
+        # and v.action_type in [3, 5, 9, 10]
       )
 
     base_query
