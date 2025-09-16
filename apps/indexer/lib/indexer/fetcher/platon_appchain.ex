@@ -857,15 +857,31 @@ defmodule Indexer.Fetcher.PlatonAppchain do
   end
 
   defp import_events(events, calling_module) do
+#    {import_data, event_name} =
+#      cond do
+#        calling_module == L1Event ->
+#          {%{l1_events: %{params: events}, timeout: :infinity}, "StateSynced"}
+#        calling_module == L1Execute ->
+#          {%{l1_executes: %{params: events}, timeout: :infinity}, "ExitProcessed"}
+#        calling_module == Checkpoint ->
+#          {%{checkpoints: %{params: events}, timeout: :infinity}, "CheckpointSubmitted"}
+#      end
+
     {import_data, event_name} =
-      cond do
-        calling_module == L1Event ->
+      case Application.get_env(:explorer, :chain_type) == :platon_appchain && calling_module do
+        L1Event ->
           {%{l1_events: %{params: events}, timeout: :infinity}, "StateSynced"}
-        calling_module == L1Execute ->
+
+        L1Execute ->
           {%{l1_executes: %{params: events}, timeout: :infinity}, "ExitProcessed"}
-        calling_module == Checkpoint ->
+
+        Checkpoint ->
           {%{checkpoints: %{params: events}, timeout: :infinity}, "CheckpointSubmitted"}
+
+        _ ->
+          {%{}, ""}
       end
+
 
     {:ok, _} = Chain.import(import_data)
 
