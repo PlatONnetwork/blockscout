@@ -157,7 +157,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec getValidatorsWithAddr(list(String.t()), non_neg_integer) :: map()
   def getValidatorsWithAddr(validator_addresses, block_number) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
-    result = get_validators_with_addr(validator_addresses) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: [block_number: "0x" <> Integer.to_string(block_number, 16)] ++ rpc_opts())
+    result = get_validators_with_addr(validator_addresses) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: Keyword.put(rpc_opts(), :block, "0x" <> Integer.to_string(block_number, 16)))
     {:ok, validators} = result
     validatorsJson = validators |> Enum.map(fn validator -> convertValidatorToJSON(validator) end)
     validatorsJson
@@ -178,7 +178,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   def getValidator(validator_hex, block_number) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
     Logger.info("get validator args validator_hex: #{validator_hex}, block_number: #{block_number}")
-    result = get_validators_with_addr([validator_hex]) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: [block: "0x" <> Integer.to_string(block_number, 16)] ++ rpc_opts())
+    result = get_validators_with_addr([validator_hex]) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: Keyword.put(rpc_opts(), :block, "0x" <> Integer.to_string(block_number, 16)))
     {:ok, validators} = result
 
     Logger.info("getValidator result: #{inspect(validators)}")
