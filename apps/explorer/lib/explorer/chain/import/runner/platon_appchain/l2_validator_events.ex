@@ -67,9 +67,11 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     # 创建超时时间和时间戳信息的map
     update_transactions_options = %{timeout: transactions_timeout, timestamps: timestamps}
 
+    filtered_changes_list = Enum.filter(changes_list, fn(e) -> e != %{} end)
+
     # 把 l2_validator_events 按 action_type 是否是新增验证人 分组
     # event_groups是个map，key: true / false value: [2_validator_event]
-    registered_events_and_others = Enum.group_by(changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:ValidatorRegistered] end)
+    registered_events_and_others = Enum.group_by(filtered_changes_list, fn(e) -> e[:action_type] == PlatonAppchain.l2_validator_event_action_type()[:ValidatorRegistered] end)
     Logger.info("to import L2ValidatorEvents #{inspect(registered_events_and_others)}")
 
     registered_events = Map.get(registered_events_and_others, true, [])
@@ -88,7 +90,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     multi
     |> Multi.run(:insert_l2_validator_events, fn repo, _ ->
       Instrumenter.block_import_stage_runner(
-        fn -> insert(repo, changes_list, insert_options) end,
+        fn -> insert(repo, filtered_changes_list, insert_options) end,
         :block_referencing,
         :l2_validator_events,
         :l2_validator_events
