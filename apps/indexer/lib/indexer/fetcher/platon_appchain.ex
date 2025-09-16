@@ -52,7 +52,7 @@ defmodule Indexer.Fetcher.PlatonAppchain do
   # 周期类型：round: 共识周期; epoch：结算周期
   #用户在L1发起，需要同步到L2的交易
   @period_type [round: 1, epoch: 2]
-  @l1_events_tx_type [deposit: 1, stake: 2, addStake: 3, delegate: 4]
+  @l1_events_tx_type [deposit: 1, stake: 2, addStake: 3, delegate: 4, slash: 5]
 
   #用户在L2发起，需要同步到L1的交易
   @l2_events_tx_type [withdraw: 1, stakeWithdraw: 2, degationWithdraw: 3, slash: 4]

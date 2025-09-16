@@ -23,9 +23,21 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Event do
 
   # 32-byte representation of deposit signature, keccak256("DEPOSIT")
   @deposit_signature "87a7811f4bfedea3d341ad165680ae306b01aaeacc205d227629cf157dd9f821"
+
+  # 32-byte representation of deposit signature, keccak256("ADDSTAKE")
   @stake_signature "1bcc0f4c3fad314e585165815f94ecca9b96690a26d6417d7876448a9a867a69"
+
+  # 32-byte representation of deposit signature, keccak256("UNSTAKE")
   @add_stake_signature "7f629647b0cf8231fa5380e25f7c9bf0685fecbdc41360b93da5b447cef9ee73"
+
+  # 32-byte representation of deposit signature, keccak256("DELEGATE")
   @delegate_signature "c7ddcf4441a1bb01353b38db832023115117943d28ad05b882de4ad99e94b8fc"
+
+  # 32-byte representation of deposit signature, keccak256("SLASH")
+  @slash_signature "117f1d6f44fd34ccb7a58f1261fa59e5c4bf68e2712d65f246a8805167a93344"
+
+  # 32-byte representation of deposit signature, keccak256("UNDELEGATE")
+  # @undelegate_signature "58e580ca1cdbe518f27d857873b615e807a3c395584a93d75e80c921c991e50f"
 
   def child_spec(start_link_arguments) do
     spec = %{
@@ -108,7 +120,15 @@ defmodule Indexer.Fetcher.PlatonAppchain.L1Event do
               TypeDecoder.decode_raw(data_bytes, [{:bytes, 32}, :address, :address, {:uint, 256}])
 
             {PlatonAppchain.l1_events_tx_type()[:delegate], delegator, validator, amount, validator, Map.get(timestamps, l1_block_number)}
+          @slash_signature ->
+            timestamps = PlatonAppchain.get_timestamps_by_events(events, json_rpc_named_arguments)
+            #  abi.encode(_SLASH_SIG, childChainEventId, validatorsToSlash, amountsToSlash)
+            [_sig, _l2EventId, validator, amount] =
+              TypeDecoder.decode_raw(data_bytes, [{:bytes, 32}, :address, :address, {:uint, 256}])
+
+            {PlatonAppchain.l1_events_tx_type()[:slash], validator, validator, amount, validator, Map.get(timestamps, l1_block_number)}
           _ ->
+            Logger.waning("ignore event SIG: #{Base.encode16(sig, case: :lower)}")
             {nil, nil, nil, nil, nil, nil}
         end
 
