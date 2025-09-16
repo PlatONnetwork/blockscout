@@ -28,6 +28,10 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
     lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())
 
       if event.action_type == PlatonAppchain.l2_validator_event_action_type()[:Slashed] do
+        validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
+        if validatorInfoMap != nil do
+          validatorInfoMap.status = bor(@l2_validator_status[:Slashing], validatorInfoMap.status)
+        end
         exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashed"}
         Map.merge(validatorInfoMap, exit_info)
         L2Validator.upsert_validator(repo, validatorInfoMap)
