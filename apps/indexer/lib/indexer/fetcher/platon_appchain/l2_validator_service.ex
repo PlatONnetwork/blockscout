@@ -29,7 +29,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
       if event.action_type == PlatonAppchain.l2_validator_event_action_type()[:Slashed] do
         validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
-        if validatorInfoMap != nil do
+        if validatorInfoMap != %{} do
           %{validatorInfoMap | status: bor(@l2_validator_status[:Slashing], validatorInfoMap.status)}
         end
         exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashed"}
