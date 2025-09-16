@@ -177,6 +177,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   @spec getValidator(String.t(), non_neg_integer) :: map()
   def getValidator(validator_hex, block_number) do
     # 将会调用config/abi/L2_StakeHandler.json中的方法，getValidatorsWithAddr
+    Logger.info("get validator args validator_hex: #{validator_hex}, block_number: #{block_number}")
     result = get_validators_with_addr([validator_hex]) |> Ethers.call(to: l2StakeHandlerContract(), rpc_opts: [block: "0x" <> Integer.to_string(block_number, 16)] ++ rpc_opts())
     {:ok, validators} = result
 
