@@ -3,7 +3,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
   更新l2_validator表记录.
   """
   require Logger
-  use Bitwise
+  import Bitwise
   alias Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler
   alias Explorer.Chain
   alias Explorer.Chain.Hash
