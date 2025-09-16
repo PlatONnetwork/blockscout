@@ -137,7 +137,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     Enum.each(l2_new_validator_events, fn validator_event ->
       case L2ValidatorService.upsert_validator(repo, Hash.to_string(validator_event.validator_hash), validator_event.block_number) do
         {:ok, _result} -> :ok
-        {:error, _reason} -> throw({:error, "add new validator(s) failed"})
+        {:error, reason} -> throw({:error, reason})
       end
     end)
     {:ok, []}
@@ -154,7 +154,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     Enum.each(l2_validator_updated_events, fn event ->
       case L2ValidatorService.update_validator_by_event(repo, event) do
         {:ok, _result} -> :ok
-        {:error, _reason} -> throw({:error, "update validator(s) failed"})
+        {:error, reason} -> throw({:error, reason})
       end
     end)
     {:ok, []}
