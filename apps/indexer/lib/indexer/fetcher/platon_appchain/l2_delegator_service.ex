@@ -28,15 +28,19 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2DelegatorService do
   # 2. 如果以上两个条件有委托相关事件，则用end of block_range作为参数，eth_call调用相应rpc接口，查询委托人详情
   @spec refreshed_delegators(list(), Range.t()) :: list()
   def refreshed_delegators(l2_validator_events, block_first..block_last) do
+
+    Logger.info("refreshed delegators: #{inspect(l2_validator_events)}")
+
     l2_delegator_events =
       if Enum.empty?(l2_validator_events) == true do
         []
       else
         l2_validator_events
-        |> Enum.filter(fn event -> event.action_type == PlatonAppchain.l2_validator_event_action_type()[:AddDelegated]
-                                   || event.action_type == PlatonAppchain.l2_validator_event_action_type()[:UnDelegated]
-                                   || event.action_type == PlatonAppchain.l2_validator_event_action_type()[:DelegateWithdrawalRegistered]
-                                   || event.action_type == PlatonAppchain.l2_validator_event_action_type()[:DelegateWithdrawal] end)
+        |> Enum.filter(fn event -> (event.action_type == PlatonAppchain.l2_validator_event_action_type()[:DelegationAdded] and event.validator_hash !=nil and event.delegator_hash != nil)
+                                   || (event.action_type == PlatonAppchain.l2_validator_event_action_type()[:UnDelegated] and event.validator_hash !=nil and event.delegator_hash != nil)
+                                   || (event.action_type == PlatonAppchain.l2_validator_event_action_type()[:DelegateWithdrawalRegistered] and event.validator_hash !=nil and event.delegator_hash != nil)
+                                   || (event.action_type == PlatonAppchain.l2_validator_event_action_type()[:DelegateWithdrawal] and event.validator_hash !=nil and event.delegator_hash != nil)
+                       end)
       end
 
 
