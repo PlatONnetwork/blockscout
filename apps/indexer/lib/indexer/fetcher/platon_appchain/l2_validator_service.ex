@@ -35,6 +35,14 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
         exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashed"}
         Map.merge(validatorInfoMap, exit_info)
         L2Validator.upsert_validator(repo, validatorInfoMap)
+      else if event.action_type == PlatonAppchain.l2_validator_event_action_type()[:UnStaked] do
+         validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
+         if validatorInfoMap != %{} do
+           %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:UnStaked], validatorInfoMap.status)}
+         end
+         exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "UnStaked"}
+         Map.merge(validatorInfoMap, exit_info)
+         L2Validator.upsert_validator(repo, validatorInfoMap)
       else
         validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number)
         exit_info =
