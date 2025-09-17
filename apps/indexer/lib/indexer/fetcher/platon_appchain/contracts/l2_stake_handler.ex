@@ -3,7 +3,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   Stake handler contract interface encapsulation
   """
   alias Ethers
-  alias Explorer.Chain.{Hash}
+  alias Explorer.Chain.{Address}
   require Logger
 
 
@@ -378,10 +378,11 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
   end
 
   defp getDelegatorDetails(delegator_hash, validator_hash) do
-    Logger.info("getDelegatorDetails, delegator_hash: #{delegator_hash}")
-    Logger.info("getDelegatorDetails, validator_hash: #{validator_hash}")
-    delegator_hash_hex = Hash.to_string(delegator_hash)
-    validator_hash_hex = Hash.to_string(validator_hash)
+    Logger.info("getDelegatorDetails, delegator_hash: #{inspect(delegator_hash)}")
+    Logger.info("getDelegatorDetails, validator_hash: #{inspect(validator_hash)}")
+    delegator_hash_hex = Address.checksum(delegator_hash)
+    validator_hash_hex = Address.checksum(validator_hash)
+
 
     withdrawal_delegate_amount = withdrawableOfDelegate(validator_hash_hex, delegator_hash_hex)
     locking_delegate_amount = pendingWithdrawalsOfDelegate(validator_hash_hex, delegator_hash_hex)
