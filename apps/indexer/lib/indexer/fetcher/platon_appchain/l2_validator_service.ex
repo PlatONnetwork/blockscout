@@ -27,38 +27,38 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
     lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())
 
-      case event.action_type do
-        PlatonAppchain.l2_validator_event_action_type()[:Slashed] ->
-          validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
-          if validatorInfoMap != %{} do
-            %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:Slashing], validatorInfoMap.status)}
+    case event.action_type do
+      PlatonAppchain.l2_validator_event_action_type()[:Slashed] ->
+        validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
+        if validatorInfoMap != %{} do
+          %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:Slashing], validatorInfoMap.status)}
+        end
+        exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashed"}
+        Map.merge(validatorInfoMap, exit_info)
+        L2Validator.upsert_validator(repo, validatorInfoMap)
+      PlatonAppchain.l2_validator_event_action_type()[:UnStaked] ->
+        validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
+        if validatorInfoMap != %{} do
+          %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:UnStaked], validatorInfoMap.status)}
+        end
+        exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "UnStaked"}
+        Map.merge(validatorInfoMap, exit_info)
+        L2Validator.upsert_validator(repo, validatorInfoMap)
+      _ ->
+        validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number)
+        exit_info =
+          cond do
+            #PlatonAppchain.l2_validator_is_unstaked(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Unstaked"}
+            #PlatonAppchain.l2_validator_is_slashed(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashing"}
+            PlatonAppchain.l2_validator_is_duplicated(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Duplicated"}
+            PlatonAppchain.l2_validator_is_lowBlocks(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowBlocks"}
+            PlatonAppchain.l2_validator_is_lowThreshold(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowThreshold"}
+            true -> %{}
           end
-          exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashed"}
-          Map.merge(validatorInfoMap, exit_info)
-          L2Validator.upsert_validator(repo, validatorInfoMap)
-        PlatonAppchain.l2_validator_event_action_type()[:UnStaked] ->
-          validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
-          if validatorInfoMap != %{} do
-            %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:UnStaked], validatorInfoMap.status)}
-          end
-          exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "UnStaked"}
-          Map.merge(validatorInfoMap, exit_info)
-          L2Validator.upsert_validator(repo, validatorInfoMap)
-        _ ->
-          validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number)
-          exit_info =
-            cond do
-              #PlatonAppchain.l2_validator_is_unstaked(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Unstaked"}
-              #PlatonAppchain.l2_validator_is_slashed(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashing"}
-              PlatonAppchain.l2_validator_is_duplicated(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Duplicated"}
-              PlatonAppchain.l2_validator_is_lowBlocks(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowBlocks"}
-              PlatonAppchain.l2_validator_is_lowThreshold(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowThreshold"}
-              true -> %{}
-            end
-          Map.merge(validatorInfoMap, exit_info)
-          #L2Validator.update_validator(repo, validatorInfoMap)
-          #有记录就更新，没有就insert
-          L2Validator.upsert_validator(repo, validatorInfoMap)
+        Map.merge(validatorInfoMap, exit_info)
+        #L2Validator.update_validator(repo, validatorInfoMap)
+        #有记录就更新，没有就insert
+        L2Validator.upsert_validator(repo, validatorInfoMap)
       end
   end
 
