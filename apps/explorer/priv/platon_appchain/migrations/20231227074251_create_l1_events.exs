@@ -12,9 +12,9 @@ defmodule Explorer.Repo.PlatonAppchain.Migrations.CreateL1Txs do
       # l1上交易hash
       add(:hash, :bytea, null: false)
       # 交易发起者
-      add(:from, :bytea, null: false)
+      add(:from, :bytea, null: true)
       # 交易接收者(l1上面接收合约)
-      add(:to, :bytea, null: false)
+      add(:to, :bytea, null: true)
       # 交易所在区块
       add(:block_number, :bigint, null: false)
       # 交易时间 客户端算根据此值计算（age）

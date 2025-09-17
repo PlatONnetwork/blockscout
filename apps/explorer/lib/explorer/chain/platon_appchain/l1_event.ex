@@ -3,9 +3,9 @@ defmodule Explorer.Chain.PlatonAppchain.L1Event do
 
   alias Explorer.Chain.{Address, Block, Hash, Wei}
 
-  @optional_attrs ~w(amount validator)a
+  @optional_attrs ~w(amount validator from to)a
 
-  @required_attrs ~w(event_id tx_type hash from to block_number block_timestamp)a
+  @required_attrs ~w(event_id tx_type hash block_number block_timestamp)a
 
   @allowed_attrs @optional_attrs ++ @required_attrs
 
