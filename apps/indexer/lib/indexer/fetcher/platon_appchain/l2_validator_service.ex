@@ -25,41 +25,33 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
     # 更新validator状态
     # todo: 由于历史区块的同步，不能保证是按区块顺序同步的，所以，不能保证validator的状态是正确的。
 
-    lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())
-
-    cond do
-      event.action_type == PlatonAppchain.l2_validator_event_action_type()[:Slashed] ->
-        validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
-        if validatorInfoMap != %{} do
-          %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:Slashing], validatorInfoMap.status)}
-        end
-        exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashed"}
-        Map.merge(validatorInfoMap, exit_info)
-        L2Validator.upsert_validator(repo, validatorInfoMap)
-      event.action_type == PlatonAppchain.l2_validator_event_action_type()[:UnStaked] ->
-        validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
-        if validatorInfoMap != %{} do
-          %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:UnStaked], validatorInfoMap.status)}
-        end
-        exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "UnStaked"}
-        Map.merge(validatorInfoMap, exit_info)
-        L2Validator.upsert_validator(repo, validatorInfoMap)
-      true ->
-        validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number)
-        exit_info =
+    if event.action_type == PlatonAppchain.l2_validator_event_action_type()[:UpdateValidatorStatus] do
+      lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())
+      # refer to : apps/indexer/lib/indexer/fetcher/platon_appchain/l2_validator_event.ex:339
+      # UpdateValidatorStatus event, amount is current status
+      validatorMap = %{
+        validator_hash: event.validator_hash,
+        status: event.amount,
+        exit_block: event.block_number,
+        lock_block: lock_block_number
+      }
+      validatorMap =
           cond do
-            #PlatonAppchain.l2_validator_is_unstaked(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Unstaked"}
-            #PlatonAppchain.l2_validator_is_slashed(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashing"}
-            PlatonAppchain.l2_validator_is_duplicated(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Duplicated"}
-            PlatonAppchain.l2_validator_is_lowBlocks(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowBlocks"}
-            PlatonAppchain.l2_validator_is_lowThreshold(validatorInfoMap.status) ->  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "LowThreshold"}
-            true -> %{}
+            PlatonAppchain.l2_validator_is_unstaked(event.amount) ->  Map.put(validatorMap, :exit_desc, "Unstaked")
+            PlatonAppchain.l2_validator_is_slashed(event.amount) ->  Map.put(validatorMap, :exit_desc, "Slashing")
+            PlatonAppchain.l2_validator_is_duplicated(event.amount) ->  Map.put(validatorMap, :exit_desc, "Duplicated")
+            PlatonAppchain.l2_validator_is_lowBlocks(event.amount) ->  Map.put(validatorMap, :exit_desc, "LowBlocks")
+            PlatonAppchain.l2_validator_is_lowThreshold(event.amount) ->  Map.put(validatorMap, :exit_desc, "LowThreshold")
+            true -> _
           end
-        Map.merge(validatorInfoMap, exit_info)
-        #L2Validator.update_validator(repo, validatorInfoMap)
-        #有记录就更新，没有就insert
-        L2Validator.upsert_validator(repo, validatorInfoMap)
+
+      #L2Validator.update_validator(repo, validatorInfoMap)
+      #有记录就更新，没有就insert
+      L2Validator.upsert_validator(repo, validatorMap)
     end
+
+
+
   end
 
   @spec increase_stake(binary(), integer()) :: {:ok, L2Validator.t()} | {:error, reason :: String.t()}
