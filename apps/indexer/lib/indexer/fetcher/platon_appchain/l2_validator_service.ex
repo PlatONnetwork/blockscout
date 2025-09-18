@@ -42,7 +42,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
             PlatonAppchain.l2_validator_is_duplicated(event.amount) ->  Map.put(validatorMap, :exit_desc, "Duplicated")
             PlatonAppchain.l2_validator_is_lowBlocks(event.amount) ->  Map.put(validatorMap, :exit_desc, "LowBlocks")
             PlatonAppchain.l2_validator_is_lowThreshold(event.amount) ->  Map.put(validatorMap, :exit_desc, "LowThreshold")
-            true -> _
+            true -> validatorMap
           end
 
       #L2Validator.update_validator(repo, validatorInfoMap)
