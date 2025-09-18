@@ -27,8 +27,8 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
 
     lock_block_number = PlatonAppchain.calculateBlockNumberAfterEpochs(event.block_number, PlatonAppchain.l2_epochs_for_locking_exit())
 
-    case event.action_type do
-      PlatonAppchain.l2_validator_event_action_type()[:Slashed] ->
+    cond do
+      event.action_type == PlatonAppchain.l2_validator_event_action_type()[:Slashed] ->
         validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
         if validatorInfoMap != %{} do
           %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:Slashing], validatorInfoMap.status)}
@@ -36,7 +36,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
         exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "Slashed"}
         Map.merge(validatorInfoMap, exit_info)
         L2Validator.upsert_validator(repo, validatorInfoMap)
-      PlatonAppchain.l2_validator_event_action_type()[:UnStaked] ->
+      event.action_type == PlatonAppchain.l2_validator_event_action_type()[:UnStaked] ->
         validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number - 1)
         if validatorInfoMap != %{} do
           %{validatorInfoMap | status: bor(PlatonAppchain.l2_validator_status()[:UnStaked], validatorInfoMap.status)}
@@ -44,7 +44,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
         exit_info =  %{exit_block: event.block_number, lock_block: lock_block_number, exit_desc: "UnStaked"}
         Map.merge(validatorInfoMap, exit_info)
         L2Validator.upsert_validator(repo, validatorInfoMap)
-      _ ->
+      true ->
         validatorInfoMap = L2StakeHandler.getValidator(Hash.to_string(event.validator_hash), event.block_number)
         exit_info =
           cond do
@@ -59,7 +59,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
         #L2Validator.update_validator(repo, validatorInfoMap)
         #有记录就更新，没有就insert
         L2Validator.upsert_validator(repo, validatorInfoMap)
-      end
+    end
   end
 
   @spec increase_stake(binary(), integer()) :: {:ok, L2Validator.t()} | {:error, reason :: String.t()}
