@@ -202,18 +202,24 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
       @slash_signature ->
         # SLASH_SIG, validators, c.stakeModule.GetSlashingPercentage(c.evm.StateDB), c.stakeModule.GetSlashIncentivePercentage(c.evm.StateDB)
         [_sig, validatorAddrList, slashingPercent, slashIncentivePercent] = TypeDecoder.decode_raw(data_bytes, [{:bytes, 32}, {:array, :address}, {:uint, 256}, {:uint, 256}])
-        first = "0x" <> Base.encode16(Enum.at(validatorAddrList, 0), case: :lower)
-        # todo 需要根据slashingPercent参数去计算amount
-        %{
-          event_id: eventID,
-          tx_type: PlatonAppchain.l2_events_tx_type()[:slash],
-          from: first,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
-          to: first,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
-          amount: slashingPercent,
-          hash: l2_transaction_hash,
-          block_number: quantity_to_integer(l2_block_number),
-          block_timestamp: l2_block_timestamp,
-        }
+        # 临时跳过validatorAddrList的情况
+        # 因为现在在L2上，通过交易调用合约的惩罚方法，发起惩罚流程，检查有满足惩罚条件的节点，此时即使没有满足惩罚条件的节点，仍然会触发一个事件。后续底层代码修改后，如果没有满足惩罚条件的节点，将不会触发事件
+        if Enum.empty?(validatorAddrList) or Enum.at(validatorAddrList, 0) == nil do
+          %{}
+        else
+          first = "0x" <> Base.encode16(Enum.at(validatorAddrList, 0), case: :lower)
+          # todo 需要根据slashingPercent参数去计算amount
+          %{
+            event_id: eventID,
+            tx_type: PlatonAppchain.l2_events_tx_type()[:slash],
+            from: first,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
+            to: first,   # 不再有用，这里需要记录的是交易的from / to， 而不是合约业务里逻辑上的from / to。逻辑上的from/to，前端可以点击合约事件的详情
+            amount: slashingPercent,
+            hash: l2_transaction_hash,
+            block_number: quantity_to_integer(l2_block_number),
+            block_timestamp: l2_block_timestamp,
+          }
+        end
       _ ->
         %{}
     end
