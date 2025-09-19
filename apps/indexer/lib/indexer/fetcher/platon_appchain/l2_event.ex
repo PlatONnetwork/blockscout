@@ -202,7 +202,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
       @slash_signature ->
         # SLASH_SIG, validators, c.stakeModule.GetSlashingPercentage(c.evm.StateDB), c.stakeModule.GetSlashIncentivePercentage(c.evm.StateDB)
         [_sig, validatorAddrList, slashingPercent, slashIncentivePercent] = TypeDecoder.decode_raw(data_bytes, [{:bytes, 32}, {:array, :address}, {:uint, 256}, {:uint, 256}])
-        # 临时跳过validatorAddrList的情况
+        # 临时跳过validatorAddrList为空的情况
         # 因为现在在L2上，通过交易调用合约的惩罚方法，发起惩罚流程，检查有满足惩罚条件的节点，此时即使没有满足惩罚条件的节点，仍然会触发一个事件。后续底层代码修改后，如果没有满足惩罚条件的节点，将不会触发事件
         if Enum.empty?(validatorAddrList) or Enum.at(validatorAddrList, 0) == nil do
           %{}
