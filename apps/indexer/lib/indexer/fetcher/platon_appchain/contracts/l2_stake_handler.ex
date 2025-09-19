@@ -377,6 +377,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler do
     |> Enum.map(fn pair ->  getDelegatorDetails(pair.delegator_hash, pair.validator_hash) end)
   end
 
+  @spec getDelegateDetails(binary(), binary()) :: map()
   defp getDelegatorDetails(delegator_hash, validator_hash) do
     Logger.info("getDelegatorDetails, delegator_hash: #{inspect(delegator_hash)}")
     Logger.info("getDelegatorDetails, validator_hash: #{inspect(validator_hash)}")
