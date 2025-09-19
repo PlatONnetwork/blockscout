@@ -124,7 +124,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2RewardEvent do
 
   @spec event_to_l2_reward_event( non_neg_integer(), binary(), binary(), binary(), list()) :: map()
   def event_to_l2_reward_event(log_index, data, l2_transaction_hash, l2_block_number, json_rpc_named_arguments) do
-    Logger.debug(fn -> "convert event to l2_event, log.data: #{inspect(data)}" end, logger: :platon_appchain)
+    Logger.debug(fn -> "convert event to l2_event(reward), log.data: #{inspect(data)}" end, logger: :platon_appchain)
 
     [data_bytes] = decode_data(data, [:bytes])
 
