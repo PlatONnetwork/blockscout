@@ -3,6 +3,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
   更新l2_validator表记录.
   """
   require Logger
+  require Decimal
   import Bitwise
   alias Indexer.Fetcher.PlatonAppchain.Contracts.L2StakeHandler
   alias Explorer.Chain
@@ -31,17 +32,17 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
       # UpdateValidatorStatus event, amount is current status
       validatorMap = %{
         validator_hash: event.validator_hash,
-        status: event.amount,
+        status: Decimal.to_integer(event.amount.value),
         exit_block: event.block_number,
         lock_block: lock_block_number
       }
       validatorMap =
           cond do
-            PlatonAppchain.l2_validator_is_unstaked(event.amount) ->  Map.put(validatorMap, :exit_desc, "Unstaked")
-            PlatonAppchain.l2_validator_is_slashed(event.amount) ->  Map.put(validatorMap, :exit_desc, "Slashing")
-            PlatonAppchain.l2_validator_is_duplicated(event.amount) ->  Map.put(validatorMap, :exit_desc, "Duplicated")
-            PlatonAppchain.l2_validator_is_lowBlocks(event.amount) ->  Map.put(validatorMap, :exit_desc, "LowBlocks")
-            PlatonAppchain.l2_validator_is_lowThreshold(event.amount) ->  Map.put(validatorMap, :exit_desc, "LowThreshold")
+            PlatonAppchain.l2_validator_is_unstaked(validatorMap.status) ->  Map.put(validatorMap, :exit_desc, "Unstaked")
+            PlatonAppchain.l2_validator_is_slashed(validatorMap.status) ->  Map.put(validatorMap, :exit_desc, "Slashing")
+            PlatonAppchain.l2_validator_is_duplicated(validatorMap.status) ->  Map.put(validatorMap, :exit_desc, "Duplicated")
+            PlatonAppchain.l2_validator_is_lowBlocks(validatorMap.status) ->  Map.put(validatorMap, :exit_desc, "LowBlocks")
+            PlatonAppchain.l2_validator_is_lowThreshold(validatorMap.status) ->  Map.put(validatorMap, :exit_desc, "LowThreshold")
             true -> validatorMap
           end
 
