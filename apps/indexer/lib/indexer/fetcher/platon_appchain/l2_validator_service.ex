@@ -46,9 +46,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
             true -> validatorMap
           end
 
-      #L2Validator.update_validator(repo, validatorInfoMap)
-      #有记录就更新，没有就insert
-      L2Validator.upsert_validator(repo, validatorMap)
+      #L2Validator.update_validator_status(repo, validatorInfoMap)
+      #只修改状态
+      L2Validator.update_validator_status(repo, validatorMap)
     else
       {:ok, "do nothing"}
     end

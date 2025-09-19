@@ -139,6 +139,15 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
          returning: true)
   end
 
+  #validator_hash: event.validator_hash,
+  #        status: Decimal.to_integer(event.amount.value),
+  #        exit_block: event.block_number,
+  #        lock_block: lock_block_number
+  @spec update_validator_status(Ecto.Repo.t(), map()) :: {:ok, Ecto.Schema.t()} | {:error, reason :: String.t()}
+  def update_validator_status(repo, dataMap) do
+    query = from v in __MODULE__, where: v.validator_hash == ^dataMap.validator_hash
+    repo.update_all(query, [set: [status: dataMap.status, exit_block: dataMap.exit_block, exit_desc: dataMap.exit_desc, lock_block: dataMap.lock_block_number]])
+  end
 
   # 修改质押金额, 如果increment就是负数，就是减少质押
   def update_stake_amount(validator_hash, increment) do
