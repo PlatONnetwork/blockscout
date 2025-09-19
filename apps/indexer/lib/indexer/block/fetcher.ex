@@ -168,7 +168,7 @@ defmodule Indexer.Block.Fetcher do
          # 获取 platon_appchain的事件
          l2_events =
            if(Application.get_env(:explorer, :chain_type) == :platon_appchain,
-             do: L2Events.parse(logs),
+             do: L2Events.parse(logs) |> Enum.reject(&Enum.empty?/1),  # 因为L2Events.parse(logs)的[]有%{},需要去除
              else: []
            ),
          l2_executes =
