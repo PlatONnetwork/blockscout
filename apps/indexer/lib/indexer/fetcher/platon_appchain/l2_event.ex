@@ -268,8 +268,9 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2Event do
           )
         end)
       end
-    # 过滤掉返回为空的events
+    # 过滤掉返回为空的events, [%{}, %{a: 1}] 过滤后是[%{a: 1}]
     filtered_events = Enum.reject(l2_events, &Enum.empty?/1)
+    Logger.error("to import l2 events, #{inspect(filtered_events)}")
     if Enum.count(filtered_events) > 0 do
       Logger.debug(fn -> "to import l2 events:(#{inspect(filtered_events)})" end , logger: :platon_appchain)
       {:ok, _} =
