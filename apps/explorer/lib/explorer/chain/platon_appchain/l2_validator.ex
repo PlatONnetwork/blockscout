@@ -143,7 +143,13 @@ defmodule Explorer.Chain.PlatonAppchain.L2Validator do
   #        status: Decimal.to_integer(event.amount.value),
   #        exit_block: event.block_number,
   #        lock_block: lock_block_number
-  @spec update_validator_status(Ecto.Repo.t(), map()) :: {:ok, Ecto.Schema.t()} | {:error, reason :: String.t()}
+  # @callback update_all(
+  #  queryable :: Ecto.Queryable.t(),
+  #  updates :: Keyword.t(),
+  #  opts :: Keyword.t()
+  #) :: {non_neg_integer(), nil | [term()]}
+
+  @spec update_validator_status(Ecto.Repo.t(), map()) :: {non_neg_integer(), nil | [term()]}
   def update_validator_status(repo, dataMap) do
     query = from v in __MODULE__, where: v.validator_hash == ^dataMap.validator_hash
     repo.update_all(query, [set: [status: dataMap.status, exit_block: dataMap.exit_block, exit_desc: dataMap.exit_desc, lock_block: dataMap.lock_block]])

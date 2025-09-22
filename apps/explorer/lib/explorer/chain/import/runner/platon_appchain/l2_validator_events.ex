@@ -154,10 +154,7 @@ defmodule Explorer.Chain.Import.Runner.PlatonAppchain.L2ValidatorEvents do
     # 因为需要事件中的block_number，所以遍历l2_validator_updated_events，而考虑只过滤出需要修改的validator_hash
 
     Enum.each(l2_validator_updated_events, fn event ->
-      case L2ValidatorService.update_validator_by_event(repo, event) do
-        {:ok, _result} -> :ok
-        {:error, reason} -> throw({:error, reason})
-      end
+      L2ValidatorService.update_validator_by_event(repo, event)
     end)
     {:ok, []}
   end

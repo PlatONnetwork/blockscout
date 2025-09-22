@@ -19,7 +19,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
     L2Validator.upsert_validator(repo, validatorMap)
   end
 
-  @spec update_validator_by_event(Repo.t(), map()) :: {:ok, integer()} | {:error, reason :: String.t()}
+  @spec update_validator_by_event(Repo.t(), map()) :: {non_neg_integer(), nil | [term()]}
   def update_validator_by_event(repo, event) do
 
     Logger.info("update_validator_by_event: #{inspect(event)}")
@@ -50,7 +50,7 @@ defmodule Indexer.Fetcher.PlatonAppchain.L2ValidatorService do
       #只修改状态
       L2Validator.update_validator_status(repo, validatorMap)
     else
-      {:ok, "do nothing"}
+      {0, nil}
     end
   end
 
